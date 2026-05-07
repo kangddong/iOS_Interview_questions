@@ -30,6 +30,13 @@
 11. [10-performance](10-performance/README.md)
 12. [11-build-system](11-build-system/README.md)
 
+## 5단계 — CS / Network 기본기
+
+iOS 도메인 외에도 거의 모든 면접에서 묻는 영역.
+
+13. [13-cs-fundamentals](13-cs-fundamentals/README.md) — process/thread, 메모리 모델, 자료구조, 알고리즘, 동기화 primitive
+14. [14-network](14-network/README.md) — TCP/UDP, HTTP/HTTPS, TLS handshake, HTTP/2/3, REST, WebSocket, DNS
+
 ## 레벨별 질문 뱅크
 
 - [주니어](questions/basic.md) — 신입~1년차. 사실 확인 + 한 줄 *왜*

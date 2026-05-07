@@ -129,6 +129,37 @@
 - **Factory / Strategy / Builder 각 패턴이 해결하는 문제** → [factory-strategy-builder](../12-design-patterns/factory-strategy-builder.md)
 - **Closure로 Strategy를 대체할 수 있는 조건** → [factory-strategy-builder](../12-design-patterns/factory-strategy-builder.md)
 
+## CS Fundamentals 심화
+
+- **프로세스와 스레드 컨텍스트 스위치 비용 차이** → [process-vs-thread](../13-cs-fundamentals/process-vs-thread.md)
+- **iOS 앱의 메모리가 100MB라는 게 실제로 뭘 의미** (resident vs virtual) → [memory-model](../13-cs-fundamentals/memory-model.md)
+- **CPU 캐시 / 공간 지역성으로 코드를 빠르게 만드는 법** → [memory-model](../13-cs-fundamentals/memory-model.md)
+- **Swift `Array.removeFirst()`가 O(n)인 이유와 큐 구현 대안** → [data-structures](../13-cs-fundamentals/data-structures.md)
+- **String.count가 O(n)인 이유** → [data-structures](../13-cs-fundamentals/data-structures.md)
+- **LRU Cache 구현 — 자료구조 조합** → [data-structures](../13-cs-fundamentals/data-structures.md)
+- **Quick Sort가 O(n²)이 되는 케이스와 회피** → [algorithm-complexity](../13-cs-fundamentals/algorithm-complexity.md)
+- **DP / Greedy / Backtracking 차이와 선택** → [algorithm-complexity](../13-cs-fundamentals/algorithm-complexity.md)
+- **데드락 4조건 + 회피 전략** → [concurrency-primitives](../13-cs-fundamentals/concurrency-primitives.md)
+- **`os_unfair_lock` vs `NSLock` vs `actor`** → [concurrency-primitives](../13-cs-fundamentals/concurrency-primitives.md) + [03-concurrency/actor-and-mainactor](../03-concurrency/actor-and-mainactor.md)
+- **Read-Write Lock 패턴 (concurrent queue + barrier)** → [concurrency-primitives](../13-cs-fundamentals/concurrency-primitives.md)
+
+## Network 심화
+
+- **TLS 1.2 / 1.3 handshake 단계와 차이** → [https-and-tls](../14-network/https-and-tls.md)
+- **HTTPS Public Key Pinning 구현과 인증서 갱신 전략 (rolling pin)** → [https-and-tls](../14-network/https-and-tls.md)
+- **App Transport Security 정책과 예외 등록** → [https-and-tls](../14-network/https-and-tls.md)
+- **HTTP/1.1 → 2 → 3 발전과 모바일 효과** → [http2-http3](../14-network/http2-http3.md)
+- **HTTP/2 multiplexing이 1.1 대비 좋은 점, 한계 (TCP HoL)** → [http2-http3](../14-network/http2-http3.md)
+- **QUIC가 모바일에 좋은 이유 (connection migration)** → [http2-http3](../14-network/http2-http3.md)
+- **POST 재시도 시 중복 생성 방지 (Idempotency-Key)** → [rest-api-design](../14-network/rest-api-design.md) + [http-basics](../14-network/http-basics.md)
+- **REST 6 제약 — stateless가 의미하는 것** → [rest-api-design](../14-network/rest-api-design.md)
+- **Offset vs Cursor 페이지네이션 트레이드오프** → [rest-api-design](../14-network/rest-api-design.md)
+- **WebSocket 끊김 감지 (ping/pong)와 재연결 전략** → [websocket](../14-network/websocket.md)
+- **채팅 앱 — WebSocket + APNs 함께 사용 + 메시지 dedup** → [websocket](../14-network/websocket.md)
+- **DNS TTL과 도메인 이전 시 일부 사용자만 옛 IP** → [dns-and-caching](../14-network/dns-and-caching.md)
+- **iOS URLCache 동작과 `Cache-Control` 헤더 매핑** → [dns-and-caching](../14-network/dns-and-caching.md) + [http-basics](../14-network/http-basics.md)
+- **TCP 4-way close에서 TIME_WAIT가 길어 보이는 이유** → [tcp-vs-udp](../14-network/tcp-vs-udp.md)
+
 ## 통합 시나리오 (실무 케이스)
 
 - **로그인 화면을 MVVM + Coordinator로 설계 — 의존성, 화면 전환, 에러 처리, 토큰 저장까지**

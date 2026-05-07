@@ -77,3 +77,26 @@
 - Bundle / `Bundle.main` vs `Bundle.module` → [spm](../11-build-system/spm.md)
 - `Info.plist` 역할과 entitlements와의 차이 → [code-signing](../11-build-system/code-signing.md)
 - Debug와 Release 차이 → [xcode-build](../11-build-system/xcode-build.md)
+
+## CS Fundamentals
+
+- 프로세스와 스레드 차이 → [process-vs-thread](../13-cs-fundamentals/process-vs-thread.md)
+- 스택과 힙 차이 → [memory-model](../13-cs-fundamentals/memory-model.md) + [02-memory-management/heap-vs-stack](../02-memory-management/heap-vs-stack.md)
+- iOS는 swap이 없는데 메모리 부족 시 어떻게? → [memory-model](../13-cs-fundamentals/memory-model.md)
+- Array vs Dictionary 시간복잡도 → [data-structures](../13-cs-fundamentals/data-structures.md)
+- Big-O가 뭔가요 → [algorithm-complexity](../13-cs-fundamentals/algorithm-complexity.md)
+- 데드락이 일어나는 조건 → [concurrency-primitives](../13-cs-fundamentals/concurrency-primitives.md)
+- Mutex vs Semaphore → [concurrency-primitives](../13-cs-fundamentals/concurrency-primitives.md)
+
+## Network
+
+- TCP와 UDP 차이 → [tcp-vs-udp](../14-network/tcp-vs-udp.md)
+- TCP 3-way handshake → [tcp-vs-udp](../14-network/tcp-vs-udp.md)
+- OSI 7계층 / TCP-IP 4계층 → [osi-and-tcp-ip](../14-network/osi-and-tcp-ip.md)
+- HTTP 메서드 종류와 의미 → [http-basics](../14-network/http-basics.md)
+- 멱등성 (idempotent)이란 → [http-basics](../14-network/http-basics.md)
+- 200 / 301 / 401 / 404 / 500 의미 → [http-basics](../14-network/http-basics.md)
+- HTTPS는 HTTP와 어떻게 다른가 → [https-and-tls](../14-network/https-and-tls.md)
+- DNS는 무엇 → [dns-and-caching](../14-network/dns-and-caching.md)
+- URL 입력부터 화면 표시까지 흐름 → [osi-and-tcp-ip](../14-network/osi-and-tcp-ip.md)
+- WebSocket을 언제 쓰나 → [websocket](../14-network/websocket.md)
