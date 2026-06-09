@@ -75,6 +75,16 @@
 - **모듈 분리 기준과 너무 일찍 / 너무 늦게의 폐해** → [modularization](../06-architecture/modularization.md)
 - **모듈 간 protocol 위치 결정 (interface 모듈 vs domain 모듈)** → [modularization](../06-architecture/modularization.md)
 - **Static vs Dynamic 링크가 런치 타임에 미치는 영향** → [modularization](../06-architecture/modularization.md) + [launch-time](../10-performance/launch-time.md)
+- **본인 팀의 Service / Store / Manager 구분 기준은? (결정 트리로 답변)** → [naming-conventions](../06-architecture/naming-conventions.md)
+  - 도메인 명사 1개 + 얕은 상태 + 비즈니스 의도 표현 → Service. 영속 소유 → Store. 인프라 연결 → Manager.
+- **`NetworkManager`는 왜 `NetworkService`가 아닌가** → [naming-conventions](../06-architecture/naming-conventions.md)
+  - 도메인 명사가 아니라 "연결 그 자체"가 책임이라 Manager.
+- **`LocationService`를 `LocationStore`로 부르는 게 더 정확한 경우** → [naming-conventions](../06-architecture/naming-conventions.md)
+  - 권한 흐름/유즈케이스가 있으면 Service, 단순 좌표 캐시면 Store.
+- **Clean Architecture의 Repository가 본인 프로젝트에 없는 이유와 그 트레이드오프** → [naming-conventions](../06-architecture/naming-conventions.md) + [clean-architecture](../06-architecture/clean-architecture.md)
+  - Service가 유즈케이스를 흡수하면 Repository는 중복. 대신 데이터 소스 추상화는 어디서 책임지는가가 질문.
+- **`ShareIntentService`와 `ShareSheetPresenter`를 분리하는 이유 (부수효과 분리 원칙)** → [naming-conventions](../06-architecture/naming-conventions.md)
+  - 도메인 로직과 UI/외부앱 호출의 책임 직교 분리.
 
 ## Networking / Persistence
 

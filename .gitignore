@@ -7,3 +7,21 @@ DerivedData/
 build/
 .swiftpm/
 Package.resolved
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.vercel/
+.playwright-mcp/
+
+# Local exam DB
+data/exam.db
+data/exam.db-journal
+data/exam.db-wal
+data/exam.db-shm
+
+# Env
+.env
+.env.local
