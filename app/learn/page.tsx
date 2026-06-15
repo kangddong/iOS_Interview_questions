@@ -4,6 +4,7 @@ import { AlertCircle, Compass, Flag, Sparkles } from "lucide-react";
 import { getAllTopics, getTopicsByCategory } from "@/lib/content";
 import { getAllProgress, getReviewQueue, getStats } from "@/lib/topic-progress";
 import { buildRecommendations, type TopicRec } from "@/lib/recommendations";
+import { summarizeCategoryQuiz } from "@/lib/topic-quiz";
 
 export const dynamic = "force-dynamic";
 
@@ -115,23 +116,55 @@ export default function LearnPage() {
       ) : null}
 
       <section className="section-block">
-        <h2>카테고리별 진도</h2>
-        <div className="category-progress-list">
+        <h2>카테고리 파이프라인 (학습 → 퀴즈 → 모의고사)</h2>
+        <p className="muted small">
+          각 카테고리의 *모든 토픽이 체크 퀴즈를 통과*하면 그 카테고리 총정리 모의고사가 활성화됩니다.
+        </p>
+        <div className="category-pipeline-list">
           {categories.map((cat) => {
+            const slugs = cat.topics.map((t) => t.slug);
             const studiedHere = cat.topics.filter((t) => progressBySlug.has(t.slug)).length;
             const total = cat.topics.length;
             const pct = total > 0 ? Math.round((studiedHere / total) * 100) : 0;
+            const quizSummary = summarizeCategoryQuiz(slugs);
             return (
-              <div key={cat.id} className="category-progress-row">
-                <Link href={`/topics`} className="category-name">
-                  {cat.title}
-                </Link>
-                <div className="progress-bar">
-                  <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+              <div key={cat.id} className="category-pipeline-row">
+                <div className="pipeline-name">{cat.title}</div>
+                <div className="pipeline-bar">
+                  <div className="progress-bar">
+                    <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="muted small">
+                    학습 {studiedHere}/{total}
+                  </span>
                 </div>
-                <span className="category-count">
-                  {studiedHere}/{total}
-                </span>
+                <div className="pipeline-quiz">
+                  {quizSummary.coveredTopics === 0 ? (
+                    <span className="mini-pill mastery-none">퀴즈 준비 중</span>
+                  ) : quizSummary.ready ? (
+                    <span className="mini-pill correct">퀴즈 {quizSummary.passedTopics}/{quizSummary.coveredTopics} 통과</span>
+                  ) : (
+                    <span className="mini-pill mastery-1">
+                      퀴즈 {quizSummary.passedTopics}/{quizSummary.coveredTopics}
+                    </span>
+                  )}
+                </div>
+                <div className="pipeline-exam">
+                  {quizSummary.ready ? (
+                    <Link
+                      href={`/exam?part=${encodeURIComponent(cat.id)}`}
+                      className="primary-button compact"
+                    >
+                      총정리 모의고사
+                    </Link>
+                  ) : (
+                    <span className="muted small">
+                      {quizSummary.coveredTopics > 0
+                        ? "모든 퀴즈 통과 후 활성화"
+                        : "객관식 문항 준비 필요"}
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}

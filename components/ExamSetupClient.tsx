@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Play, SlidersHorizontal } from "lucide-react";
 import type { ExamQuestion, ExamSettings, Level } from "@/lib/types";
-import { EXAM_PARTS } from "@/lib/exam-parts";
+import { EXAM_PARTS, partIdForCategory } from "@/lib/exam-parts";
 import { filterPool } from "@/lib/exam-builder";
 
 const SETTINGS_KEY = "ios-interview-exam-settings";
@@ -26,10 +26,11 @@ export function ExamSetupClient({ questions }: ExamSetupClientProps) {
 
   useEffect(() => {
     const raw = localStorage.getItem(SETTINGS_KEY);
+    let next: ExamSettings = DEFAULT_SETTINGS;
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as Partial<ExamSettings> & Record<string, unknown>;
-        setSettings({
+        next = {
           level: (parsed.level as Level | "all") ?? DEFAULT_SETTINGS.level,
           objectiveCount:
             typeof parsed.objectiveCount === "number"
@@ -44,11 +45,25 @@ export function ExamSetupClient({ questions }: ExamSetupClientProps) {
             typeof parsed.durationMinutes === "number"
               ? parsed.durationMinutes
               : DEFAULT_SETTINGS.durationMinutes,
-        });
+        };
       } catch {
         /* keep defaults */
       }
     }
+
+    // ?part=<categoryId|partId> 우선 적용 (총정리 모의고사 CTA)
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      const part = url.searchParams.get("part");
+      if (part) {
+        const partId = partIdForCategory(part) ?? part;
+        if (EXAM_PARTS.some((p) => p.id === partId)) {
+          next = { ...next, partIds: [partId] };
+        }
+      }
+    }
+
+    setSettings(next);
     setHydrated(true);
   }, []);
 

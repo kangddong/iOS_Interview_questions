@@ -35,3 +35,24 @@ export function partIdFor(category: string): string {
 export function partLabel(id: string): string {
   return EXAM_PARTS.find((p) => p.id === id)?.label ?? id;
 }
+
+const CATEGORY_TO_PART: Record<string, string> = {
+  "01-swift-language":     "swift",
+  "02-memory-management":  "memory",
+  "03-concurrency":        "concurrency",
+  "04-uikit":              "uikit",
+  "05-swiftui":            "swiftui",
+  "06-architecture":       "architecture",
+  "07-networking":         "networking",
+  "08-persistence":        "networking",
+  "09-testing":            "testing",
+  "10-performance":        "performance",
+  "11-build-system":       "build",
+  "12-design-patterns":    "patterns",
+  "13-cs-fundamentals":    "cs",
+  "14-network":            "network",
+};
+
+export function partIdForCategory(categoryId: string): string | undefined {
+  return CATEGORY_TO_PART[categoryId];
+}

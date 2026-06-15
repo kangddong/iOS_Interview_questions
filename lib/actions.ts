@@ -12,6 +12,7 @@ import {
   resetProgress as dbResetProgress,
   type ProgressOutcome,
 } from "@/lib/topic-progress";
+import { getQuizPoolForTopic, submitQuiz as dbSubmitQuiz } from "@/lib/topic-quiz";
 import type { ExamResult } from "@/lib/types";
 
 export async function saveAttemptAction(result: ExamResult): Promise<{ id: string }> {
@@ -68,4 +69,48 @@ export async function resetProgressAction(formData: FormData): Promise<void> {
   revalidatePath(`/topics/${slug}`);
   revalidatePath("/learn");
   revalidatePath("/review");
+}
+
+export interface QuizSubmissionPayload {
+  slug: string;
+  answers: Array<{ questionId: string; chosen: string }>;
+}
+
+export interface QuizActionResult {
+  passed: boolean;
+  total: number;
+  correct: number;
+  details: Array<{
+    questionId: string;
+    chosen: string;
+    correct: string;
+    isCorrect: boolean;
+  }>;
+}
+
+export async function submitQuizAction(
+  payload: QuizSubmissionPayload
+): Promise<QuizActionResult> {
+  const pool = getQuizPoolForTopic(payload.slug);
+  const byId = new Map(pool.map((q) => [q.id, q]));
+  const details = payload.answers.map((a) => {
+    const q = byId.get(a.questionId);
+    const correctId = q?.correctChoiceId ?? "";
+    return {
+      questionId: a.questionId,
+      chosen: a.chosen,
+      correct: correctId,
+      isCorrect: !!correctId && a.chosen === correctId,
+    };
+  });
+  const result = dbSubmitQuiz(payload.slug, details);
+  revalidatePath(`/topics/${payload.slug}`);
+  revalidatePath("/learn");
+  revalidatePath("/review");
+  return {
+    passed: result.attempt.passed,
+    total: result.attempt.total,
+    correct: result.attempt.correct,
+    details: result.details,
+  };
 }

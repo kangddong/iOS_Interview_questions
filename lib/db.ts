@@ -68,6 +68,18 @@ function migrate(db: Database.Database) {
 
     CREATE INDEX IF NOT EXISTS idx_progress_review  ON topic_progress(next_review_at);
     CREATE INDEX IF NOT EXISTS idx_progress_mastery ON topic_progress(mastery_level);
+
+    CREATE TABLE IF NOT EXISTS topic_quiz_attempt (
+      id            TEXT PRIMARY KEY,
+      slug          TEXT NOT NULL,
+      taken_at      TEXT NOT NULL,
+      total         INTEGER NOT NULL,
+      correct       INTEGER NOT NULL,
+      passed        INTEGER NOT NULL,
+      details_json  TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_quiz_slug ON topic_quiz_attempt(slug, taken_at DESC);
   `);
 }
 
