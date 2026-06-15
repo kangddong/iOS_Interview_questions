@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { BookOpen, GraduationCap, ListChecks, PenLine } from "lucide-react";
+import { BookOpen, GraduationCap, ListChecks, PenLine, Repeat, Sparkles } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/topics", label: "지식 베이스", icon: BookOpen },
+  { href: "/learn", label: "학습하기", icon: Sparkles },
+  { href: "/review", label: "복습하기", icon: Repeat },
   { href: "/questions", label: "질문 뱅크", icon: ListChecks },
   { href: "/exam", label: "모의고사", icon: PenLine }
 ];

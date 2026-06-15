@@ -55,6 +55,19 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_answer_pending
       ON exam_answer(graded_at)
       WHERE type='subjective' AND grade IS NULL;
+
+    CREATE TABLE IF NOT EXISTS topic_progress (
+      slug             TEXT PRIMARY KEY,
+      first_studied_at TEXT NOT NULL,
+      last_studied_at  TEXT NOT NULL,
+      study_count      INTEGER NOT NULL DEFAULT 1,
+      mastery_level    INTEGER NOT NULL DEFAULT 1,
+      next_review_at   TEXT NOT NULL,
+      interval_days    INTEGER NOT NULL DEFAULT 1
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_progress_review  ON topic_progress(next_review_at);
+    CREATE INDEX IF NOT EXISTS idx_progress_mastery ON topic_progress(mastery_level);
   `);
 }
 

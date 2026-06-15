@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock3 } from "lucide-react";
 import { MarkdownArticle } from "@/components/MarkdownArticle";
+import { TopicProgressPanel } from "@/components/TopicProgressPanel";
 import { getAllTopics, getQuestionBank, getTopicBySlug } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
 
 interface TopicPageProps {
   params: Promise<{
@@ -60,6 +63,8 @@ export default async function TopicPage({ params }: TopicPageProps) {
         <div className="markdown-body">
           <MarkdownArticle sourcePath={topic.sourcePath} body={topic.body} />
         </div>
+
+        <TopicProgressPanel slug={topic.slug} />
       </article>
 
       <aside className="article-aside" aria-label="문서 보조 정보">

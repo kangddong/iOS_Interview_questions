@@ -1204,3 +1204,137 @@ button {
   font-size: 14px;
 }
 .exam-preview .warn { color: #b45309; font-weight: 500; }
+
+/* Topic progress panel */
+.topic-progress {
+  margin-top: 32px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: linear-gradient(0deg, #fafbfc, #fff);
+  display: grid;
+  gap: 12px;
+}
+.topic-progress-head { display: flex; align-items: center; justify-content: space-between; }
+.topic-progress h2 { margin: 0; font-size: 18px; }
+.progress-meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.progress-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.progress-rule { font-size: 13px; color: var(--muted); }
+.progress-rule ul { margin: 6px 0 0 16px; }
+
+.secondary-button.danger { color: #b91c1c; border-color: #fecaca; }
+
+/* Mastery pills */
+.mastery-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.mastery-none { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+.mastery-0    { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.mastery-1    { background: #fff7ed; color: #b45309; border-color: #fed7aa; }
+.mastery-2    { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+.mastery-3    { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+
+/* Learn dashboard */
+.section-block { margin-top: 28px; display: grid; gap: 12px; }
+.section-block h2 { font-size: 20px; margin: 0; }
+
+.recommendation-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.learn-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color .15s;
+}
+.learn-card:hover { border-color: #2563eb; }
+.card-eyebrow { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+.card-meta    { font-size: 12px; color: var(--muted); }
+
+.category-progress-list { display: grid; gap: 8px; }
+.category-progress-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 60px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+}
+.category-name { color: var(--ink); text-decoration: none; font-weight: 500; }
+.category-name:hover { text-decoration: underline; }
+.progress-bar {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+  transition: width .25s;
+}
+.category-count { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.recent-list { display: grid; gap: 6px; }
+.recent-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 160px 160px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+.recent-row:hover { background: #f8fafc; }
+.recent-title { font-weight: 500; }
+
+/* Review queue */
+.review-list { display: grid; gap: 12px; }
+.review-card {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color .15s;
+}
+.review-card:hover { border-color: #2563eb; }
+.review-card-head { display: flex; justify-content: space-between; align-items: center; }
+.review-card h3 { margin: 0; font-size: 18px; }
+.review-meta { display: flex; gap: 12px; font-size: 13px; color: var(--muted); }
+.overdue-pill {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  color: var(--muted);
+}
