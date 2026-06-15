@@ -10,6 +10,10 @@
 - [앱 런치 타임](launch-time.md) — pre-main / main / first frame, 측정과 개선
 - [MetricKit / Crash Symbolication / Binary Size](metrickit-and-crash.md) — *3년차+*. 사용자 메트릭, dSYM, watchdog 크래시
 
+## 시니어
+
+- [렌더링 예산과 Hitch (60/120Hz, hitchtime ratio, 측정→대응)](rendering-budget-and-hitch.md)
+
 ## 자주 묻는 질문
 
 - 스크롤이 끊긴다 — 어디부터 보나 → [main-thread-and-hitch.md](main-thread-and-hitch.md) + [image-and-scroll.md](image-and-scroll.md)

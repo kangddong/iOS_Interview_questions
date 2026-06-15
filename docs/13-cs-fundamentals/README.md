@@ -10,6 +10,10 @@ iOS 면접에서 자주 묻는 컴퓨터 과학 기본기. *iOS 컨텍스트와 
 - [알고리즘 / 시간복잡도](algorithm-complexity.md) — 정렬/탐색/그래프/DP 패턴
 - [동기화 Primitive](concurrency-primitives.md) — Mutex/Semaphore/RWLock/Atomic, 데드락 4조건
 
+## 시니어
+
+- [System Design 입문 (모바일 클라이언트 7가지 관심사)](system-design-intro.md) — 오프라인/동기화, 토큰, 캐시, 실시간, 푸시, feature flag, 관측성
+
 ## 자주 묻는 질문
 
 - 프로세스와 스레드 차이 → [process-vs-thread.md](process-vs-thread.md)

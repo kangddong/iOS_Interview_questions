@@ -10,6 +10,10 @@ iOS 컨텍스트에서의 패턴. *언제 쓰는가*가 답변의 핵심.
 - [Composition over Inheritance](composition-over-inheritance.md) — protocol + struct 합성
 - [Factory / Strategy / Builder](factory-strategy-builder.md) — *3년차+*. 객체 생성 / 알고리즘 교체 / 단계별 구성
 
+## 시니어
+
+- [Swift Idiomatic Patterns (Closure vs Delegate vs Combine vs AsyncSequence)](swift-idiomatic-patterns.md) — 선택 기준 + 변환 어댑터
+
 ## 관련 (다른 디렉토리)
 
 - Coordinator → [06-architecture/coordinator.md](../06-architecture/coordinator.md)

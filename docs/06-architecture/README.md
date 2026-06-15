@@ -12,6 +12,10 @@
 - [모듈화 (Modularization)](modularization.md) — *3년차+*. SPM/Tuist, 의존 방향 강제, public API 설계
 - [레이어 명명 컨벤션](naming-conventions.md) — Service / Store / Manager / Provider / Presenter / Launcher / Logger 직교 분리
 
+## 시니어
+
+- [모듈 경계 설계 (Interface vs Impl / 의존 방향 / Static vs Dynamic)](module-boundary-design.md)
+
 ## 자주 묻는 질문
 
 - MVVM에서 ViewModel이 View를 모르게 하는 방법 → [mvc-vs-mvvm.md](mvc-vs-mvvm.md)
