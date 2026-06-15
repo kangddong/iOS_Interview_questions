@@ -96,6 +96,12 @@ export const CATEGORIES: CategoryMeta[] = [
     title: "Network",
     description: "TCP/UDP, HTTP, TLS, DNS, WebSocket",
     order: 14
+  },
+  {
+    id: "15-paradigms",
+    title: "Paradigms",
+    description: "OOP, FP, 명령형 vs 선언형, Swift의 멀티 패러다임",
+    order: 15
   }
 ];
 

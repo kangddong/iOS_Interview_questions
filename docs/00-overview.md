@@ -37,6 +37,12 @@ iOS 도메인 외에도 거의 모든 면접에서 묻는 영역.
 13. [13-cs-fundamentals](13-cs-fundamentals/README.md) — process/thread, 메모리 모델, 자료구조, 알고리즘, 동기화 primitive
 14. [14-network](14-network/README.md) — TCP/UDP, HTTP/HTTPS, TLS handshake, HTTP/2/3, REST, WebSocket, DNS
 
+## 6단계 — 프로그래밍 패러다임
+
+언어 위에서 *어떻게 모델링하는가*. *왜 SwiftUI는 선언형인가*, *왜 Swift는 POP을 권장*인가의 근거.
+
+15. [15-paradigms](15-paradigms/README.md) — OOP 4원칙/SOLID, FP(순수 함수/불변성/Monad), 명령형 vs 선언형
+
 ## 레벨별 질문 뱅크
 
 - [주니어](questions/basic.md) — 신입~1년차. 사실 확인 + 한 줄 *왜*

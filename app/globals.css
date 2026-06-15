@@ -1460,3 +1460,81 @@ button {
   .category-pipeline-row { grid-template-columns: 1fr; gap: 8px; }
   .pipeline-quiz, .pipeline-exam { justify-content: flex-start; }
 }
+
+/* Level tabs on /topics */
+.level-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 6px 0 16px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.level-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink);
+  transition: all .15s;
+}
+.level-tab strong { font-weight: 600; }
+.level-tab-count {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.level-tab:hover { background: #fff; }
+.level-tab.active {
+  background: #fff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgba(37,99,235,0.12);
+}
+.level-tab.active .level-tab-count {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.topic-category-blocks { display: grid; gap: 28px; }
+.topic-category-block { display: grid; gap: 12px; }
+.topic-category-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+.topic-category-head h2 { margin: 0; font-size: 22px; }
+
+.topic-card-foot {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.level-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.level-chip.level-basic        { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.level-chip.level-intermediate { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+.level-chip.level-advanced     { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }

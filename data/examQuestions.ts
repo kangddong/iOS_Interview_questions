@@ -1507,5 +1507,199 @@ export const objectiveExamQuestions: RawExamQuestion[] = [
     correctChoiceId: "a",
     explanation: "cert는 만료/교체가 잦지만 key는 그대로 둘 수 있어 운영 부담 감소.",
     relatedTopicSlugs: ["14-network/tls-handshake-deep", "07-networking/network-stack-and-pinning"]
+  },
+
+  // ===== Paradigms (OOP / FP / 명령형 / 선언형) =====
+  {
+    id: "objective-basic-oop-001",
+    type: "objective",
+    level: "basic",
+    category: "Paradigms",
+    prompt: "OOP 4원칙으로 옳게 묶인 것은?",
+    choices: [
+      { id: "a", text: "캡슐화 / 상속 / 다형성 / 추상화" },
+      { id: "b", text: "분기 / 반복 / 호출 / 종료" },
+      { id: "c", text: "값 / 참조 / 함수 / Monad" },
+      { id: "d", text: "Layer / Module / Service / View" }
+    ],
+    correctChoiceId: "a",
+    explanation: "캡슐화/상속/다형성/추상화가 정통 4원칙. Swift도 표현하지만 일부는 protocol로 대체.",
+    relatedTopicSlugs: ["15-paradigms/oop"]
+  },
+  {
+    id: "objective-intermediate-oop-002",
+    type: "objective",
+    level: "intermediate",
+    category: "Paradigms",
+    prompt: "SOLID의 D(IP)가 의미하는 것은?",
+    choices: [
+      { id: "a", text: "고수준 모듈이 저수준 구현이 아닌 *추상*에 의존" },
+      { id: "b", text: "데이터를 항상 immutable로 유지" },
+      { id: "c", text: "모든 클래스에 deinit을 둠" },
+      { id: "d", text: "인터페이스를 가능한 크게 만든다" }
+    ],
+    correctChoiceId: "a",
+    explanation: "DIP — Dependency Inversion. Repository protocol 의존 + Live/Mock 주입이 대표 적용.",
+    relatedTopicSlugs: ["15-paradigms/oop", "06-architecture/dependency-injection"]
+  },
+  {
+    id: "objective-advanced-oop-003",
+    type: "objective",
+    level: "advanced",
+    category: "Paradigms",
+    prompt: "Liskov Substitution 위반의 대표 예는?",
+    choices: [
+      { id: "a", text: "Rectangle 슈퍼에 Square 서브 — setWidth가 height도 바꿔 슈퍼 계약 위반" },
+      { id: "b", text: "private 메서드를 override한 경우" },
+      { id: "c", text: "프로토콜에 default 구현을 제공한 경우" },
+      { id: "d", text: "abstract class를 사용하지 않은 경우" }
+    ],
+    correctChoiceId: "a",
+    explanation: "서브가 슈퍼와 *바꿔도 같은 동작 보장* 못 하면 LSP 위반. 모델링이 잘못된 신호.",
+    relatedTopicSlugs: ["15-paradigms/oop"]
+  },
+  {
+    id: "objective-basic-fp-001",
+    type: "objective",
+    level: "basic",
+    category: "Paradigms",
+    prompt: "순수 함수(pure function)의 두 조건은?",
+    choices: [
+      { id: "a", text: "참조 투명성 + 부작용 없음" },
+      { id: "b", text: "비동기 + 옵셔널 반환" },
+      { id: "c", text: "재귀 + 꼬리 호출 최적화" },
+      { id: "d", text: "1줄 표현 + closure" }
+    ],
+    correctChoiceId: "a",
+    explanation: "같은 입력 → 같은 출력 + 외부 상태 변경 없음. 테스트와 병렬화에 강점.",
+    relatedTopicSlugs: ["15-paradigms/fp"]
+  },
+  {
+    id: "objective-intermediate-fp-002",
+    type: "objective",
+    level: "intermediate",
+    category: "Paradigms",
+    prompt: "Optional의 flatMap이 map과 다른 점은?",
+    choices: [
+      { id: "a", text: "변환 결과가 *옵셔널을 반환*해도 중첩(Optional<Optional<T>>)을 자동 평탄화" },
+      { id: "b", text: "비동기 변환을 지원" },
+      { id: "c", text: "nil이면 fatalError" },
+      { id: "d", text: "에러를 throws로 전파" }
+    ],
+    correctChoiceId: "a",
+    explanation: "Monad의 flatMap = map + 평탄화. Optional/Result/Array가 같은 패턴.",
+    relatedTopicSlugs: ["15-paradigms/fp", "01-swift-language/optional"]
+  },
+  {
+    id: "objective-advanced-fp-003",
+    type: "objective",
+    level: "advanced",
+    category: "Paradigms",
+    prompt: "Functional Core, Imperative Shell 패턴의 의미는?",
+    choices: [
+      { id: "a", text: "비즈니스 로직은 *순수 함수*, IO/UI/외부 효과는 *얇은 객체 셸*에 격리" },
+      { id: "b", text: "UI만 함수형, 모델은 OOP로 작성" },
+      { id: "c", text: "모든 메서드를 static으로 작성" },
+      { id: "d", text: "Class는 final, struct는 mutating 금지" }
+    ],
+    correctChoiceId: "a",
+    explanation: "TCA Reducer/Effect 분리가 대표 구현. 코어는 unit test로 대규모 커버 가능.",
+    relatedTopicSlugs: ["15-paradigms/fp", "15-paradigms/oop-vs-fp", "06-architecture/tca"]
+  },
+  {
+    id: "objective-intermediate-vs-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Paradigms",
+    prompt: "Swift에서 *값/참조 + OOP/FP*를 직교 분리한 가이드라인은?",
+    choices: [
+      { id: "a", text: "정체성/공유 상태 → class/actor, 값 변환/스냅샷 → struct/enum/함수" },
+      { id: "b", text: "성능이 중요한 코드는 class, 그 외는 struct" },
+      { id: "c", text: "ObjC 인터롭만 class, 나머지는 모두 struct" },
+      { id: "d", text: "@Observable이 있으면 무조건 struct" }
+    ],
+    correctChoiceId: "a",
+    explanation: "객체로 *정체성*을, 값/함수로 *변환과 흐름*을 모델링하는 게 표준 Swift 가이드.",
+    relatedTopicSlugs: ["15-paradigms/oop-vs-fp"]
+  },
+  {
+    id: "objective-advanced-vs-002",
+    type: "objective",
+    level: "advanced",
+    category: "Paradigms",
+    prompt: "동시성 안전성 측면에서 FP가 OOP 대비 유리한 이유는?",
+    choices: [
+      { id: "a", text: "불변 데이터엔 race 자체가 발생하지 않음" },
+      { id: "b", text: "함수가 자동으로 thread-safe하게 컴파일됨" },
+      { id: "c", text: "GIL 기반으로 한 번에 한 thread만 동작" },
+      { id: "d", text: "Closure가 자동으로 weak 캡처됨" }
+    ],
+    correctChoiceId: "a",
+    explanation: "불변성이 race condition의 *전제*를 무너뜨림. Sendable과 자연스럽게 결합.",
+    relatedTopicSlugs: ["15-paradigms/oop-vs-fp", "03-concurrency/sendable"]
+  },
+  {
+    id: "objective-basic-decl-001",
+    type: "objective",
+    level: "basic",
+    category: "Paradigms",
+    prompt: "명령형(imperative)과 선언형(declarative) UI 코드의 본질적 차이는?",
+    choices: [
+      { id: "a", text: "명령형은 *어떻게* 단계 지시, 선언형은 *무엇* 결과 기술" },
+      { id: "b", text: "명령형은 UIKit, 선언형은 ObjC 기반" },
+      { id: "c", text: "명령형은 동기, 선언형은 비동기" },
+      { id: "d", text: "선언형은 단위 테스트가 불가능" }
+    ],
+    correctChoiceId: "a",
+    explanation: "선언형은 *최종 상태*를 기술하고 framework가 경로를 결정. SwiftUI의 본질.",
+    relatedTopicSlugs: ["15-paradigms/imperative-vs-declarative"]
+  },
+  {
+    id: "objective-intermediate-decl-002",
+    type: "objective",
+    level: "intermediate",
+    category: "Paradigms",
+    prompt: "SwiftUI에서 선언형 사고가 적용된 결과로 옳은 것은?",
+    choices: [
+      { id: "a", text: "view = state의 함수, state 변경 시 framework가 diff로 재렌더" },
+      { id: "b", text: "tableView.reloadData를 매번 호출해야 함" },
+      { id: "c", text: "AutoLayout constraint를 명시적으로 다룸" },
+      { id: "d", text: "delegate를 모든 컴포넌트에 직접 연결" }
+    ],
+    correctChoiceId: "a",
+    explanation: "f(state) = UI. 상태와 UI의 일관성을 framework가 보장.",
+    relatedTopicSlugs: ["15-paradigms/imperative-vs-declarative", "05-swiftui/declarative-and-view-struct"]
+  },
+  {
+    id: "objective-advanced-decl-003",
+    type: "objective",
+    level: "advanced",
+    category: "Paradigms",
+    prompt: "선언형 모델의 *숨은 비용*으로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "identity/lifetime 책임이 framework에 위임돼 *왜 안 그려지나*를 추적해야 함" },
+      { id: "b", text: "메모리 사용량이 항상 더 큼" },
+      { id: "c", text: "thread 안전성이 깨짐" },
+      { id: "d", text: "Swift Concurrency와 호환되지 않음" }
+    ],
+    correctChoiceId: "a",
+    explanation: ".id, ForEach id, View 구조 안정성을 잘못 다루면 state 초기화/transition 깨짐.",
+    relatedTopicSlugs: ["15-paradigms/imperative-vs-declarative", "05-swiftui/view-identity-and-lifetime"]
+  },
+  {
+    id: "objective-intermediate-pop-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Paradigms",
+    prompt: "Protocol-Oriented Programming이 OOP 상속 모델과 다른 점은?",
+    choices: [
+      { id: "a", text: "*수평적* 작은 protocol 다중 채택 + extension default → 결합도↓" },
+      { id: "b", text: "protocol이 자동으로 thread-safe" },
+      { id: "c", text: "POP은 class에만 적용 가능" },
+      { id: "d", text: "상속을 컴파일러 차원에서 금지" }
+    ],
+    correctChoiceId: "a",
+    explanation: "POP은 *능력을 조립*. 깊은 상속 트리의 fragile base class 문제를 회피.",
+    relatedTopicSlugs: ["15-paradigms/oop", "01-swift-language/protocol-oriented-programming"]
   }
 ];

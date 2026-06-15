@@ -20,6 +20,7 @@ export const EXAM_PARTS: ExamPart[] = [
   { id: "network",      label: "Network",                match: /^Network($| |\/|\b)/i },
   { id: "security",     label: "보안",                    match: /보안|Security/i },
   { id: "scenario",     label: "통합 시나리오",            match: /시나리오|Scenario/i },
+  { id: "paradigms",    label: "Paradigms (OOP/FP)",     match: /Paradigm|OOP|FP/i },
   { id: "etc",          label: "기타",                    match: /기타/i },
 ];
 
@@ -51,6 +52,7 @@ const CATEGORY_TO_PART: Record<string, string> = {
   "12-design-patterns":    "patterns",
   "13-cs-fundamentals":    "cs",
   "14-network":            "network",
+  "15-paradigms":          "paradigms",
 };
 
 export function partIdForCategory(categoryId: string): string | undefined {
