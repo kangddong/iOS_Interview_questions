@@ -1,118 +1,156 @@
-# 앱 런치 타임
+# 앱 런치 타임 (Cold / Warm / Hot, pre-main / main / first frame)
 
-> 한 줄 요약 — 사용자가 *아이콘을 눌러서 첫 인터랙션 가능 시점*까지의 시간. **pre-main → main → first frame** 구간으로 나눠 측정한다.
+> 한 줄 요약 — 런치는 **pre-main**(dyld → libSystem → ObjC runtime → static init), **main**(앱 객체/scene 생성, didFinishLaunching), **first frame**(첫 useful frame 렌더) 3단계로 나뉜다. cold launch는 *수백 ms ~ 수 초* 예산. Instruments → App Launch + MetricKit으로 단계별 측정 → 어디서 시간을 쓰는지 가시화.
 
-## 단계
+## 3단계 모델
 
 ```
-[ 아이콘 탭 ]
-    │
-    ▼
-[ pre-main ]  — dyld가 동적 라이브러리/심볼 로드, ObjC 런타임 초기화
-    │
-    ▼
-[ main ] — UIApplicationMain → didFinishLaunching → SceneDelegate 등장
-    │
-    ▼
-[ first frame ] — 루트 뷰가 그려져 화면에 등장
-    │
-    ▼
-[ first interactive ] — 사용자 입력 받을 준비 완료
+[0] dyld   — 동적 라이브러리 로드, rebase, bind
+[1] libObjC — ObjC class realize, +load 호출, framework init
+[2] static initializers — C++ global ctor, Swift @_cdecl init
+─── main() 진입 ───
+[3] UIApplicationMain / @main
+[4] didFinishLaunching
+[5] Scene / Window 생성, root VC viewDidLoad
+[6] first frame commit
 ```
 
-면접에서 "콜드 스타트가 느려요. 어디부터 보나요?"가 단골.
+iOS 15+에서 *App Launch Instruments*가 단계별 분해 제공.
 
-## 측정
+## Cold / Warm / Hot
 
-### Xcode Organizer / MetricKit
+| 종류 | 정의 | 예산 |
+|---|---|---|
+| **Cold** | 부팅 후 첫 실행 또는 종료 후 재실행 | iPhone 12: ~400ms 권장, 1초 넘으면 hitch 인식 |
+| **Warm** | 메모리에서 종료됐지만 dyld 캐시 살아있음 | ~수십 ms |
+| **Hot** | 백그라운드 → 포그라운드 복귀 | 즉시 |
 
-실제 사용자 디바이스에서 모인 *실측* 런치 타임 통계. 가장 신뢰도 높음.
+면접 답변 시 *cold launch가 가장 중요* — 사용자가 가장 자주 체감.
 
-### Instruments — App Launch
+## Pre-main 최적화
 
-각 단계별 시간 + 호출 스택. *어떤 dylib가 오래 걸리는지*, `+load`/`init`이 얼마나 무거운지.
+### 동적 라이브러리 줄이기
 
-### XCTest measure
+- *embedded framework 수*가 많을수록 dyld 단계 시간 증가
+- 대안: SPM의 **static framework** (Mach-O 통합)
+- iOS 13+ `dyld 3` cache가 시스템 라이브러리는 캐시 — 앱 자체 framework는 별개
+
+### `+load` / static initializer 피하기
+
+```objc
++ (void)load { /* iOS 앱 시작 전 호출됨, dyld 단계에 비용 추가 */ }
+```
+
+- ObjC `+load`는 *모든 클래스에 대해 호출* → 비용 큼
+- Swift static initializer: `static let` 사용 시 *lazy*라 main 후 실행
+- 그러나 `@_cdecl`/`__attribute__((constructor))` C global ctor는 pre-main 실행
+
+### Linker 최적화
+
+- `LINK_TIME_OPTIMIZATION = YES` (LTO) → dead code 제거
+- `STRIP_INSTALLED_PRODUCT = YES` → 디버그 심볼 제거
+- `STRIP_SWIFT_SYMBOLS = YES`
+
+## Main 단계 최적화
+
+### didFinishLaunching에서 *최소만*
 
 ```swift
-class LaunchTests: XCTestCase {
-    override class var runsForEachTargetApplicationUIConfiguration: Bool { true }
+// ❌
+func application(_:_:) -> Bool {
+    AnalyticsSDK.init()
+    LocationManager.start()
+    Network.warmup()
+    CrashReporter.install()
+    /* ... 100ms+ ... */
+    return true
+}
 
-    func test_launchPerformance() throws {
-        if #available(iOS 13.0, *) {
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
+// ✅ 지연 + 우선순위 분리
+func application(_:_:) -> Bool {
+    CrashReporter.install()        // 가장 먼저 (다음 단계 보호)
+    Task(priority: .userInitiated) {
+        AnalyticsSDK.init()
+        Network.warmup()
     }
+    Task(priority: .utility) {
+        LocationManager.start()
+    }
+    return true
 }
 ```
 
-CI에서 회귀 감시. 단, 측정 환경이 일정해야 의미 있음.
+원칙:
+- *첫 화면 그릴 때 꼭 필요한 것*만 동기
+- 나머지는 *Task로 분리*해 background 우선순위
 
-## 흔한 원인
+### 의존성 주입 컨테이너
 
-### pre-main이 느림
+큰 DI graph 일괄 생성은 비용. *Lazy 등록* + *필요 시 생성*. 자세히는 [06-architecture/dependency-injection.md](../06-architecture/dependency-injection.md).
 
-- 동적 프레임워크가 너무 많음 (특히 ObjC 카테고리/`+load`).
-- App Store가 권장: dylib 6개 이하. 더 많으면 *static link* 검토.
-- Swift는 `+load` 없지만 글로벌 변수 초기화가 비슷한 효과.
+## First Frame 최적화
 
-### didFinishLaunching이 느림
+### Root View 단순화
 
-- 분석/Crashlytics/광고 SDK 다수 *동시 초기화*.
-- 큰 Core Data store load.
-- 동기 네트워크 요청.
-- 글로벌 변수 lazy init이 무거움.
+- splash → 첫 콘텐츠 화면이 *바로 사용 가능 상태*가 아니면 깜빡임/로딩 화면 노출
+- *placeholder UI* + 비동기 데이터 로드 (skeleton)
+- 큰 이미지/리소스 동기 로드 X
 
-해결: 필수가 아닌 SDK는 *lazy*하게 (첫 화면 보여 준 뒤). `Task.detached`로 백그라운드 초기화.
+### Auto Layout 깊이
 
-### first frame이 느림
+깊은 view hierarchy + 복잡한 constraint = layout pass 비용 증가. 가능한 *flat*하게.
 
-- 루트 뷰 안에서 큰 데이터 즉시 로드.
-- 큰 이미지 디코드.
-- AutoLayout 충돌 폭주.
+### SwiftUI 첫 view tree
 
-해결: 루트는 placeholder 빠르게 → 콘텐츠는 점진 로드.
+- View body 비용 + identity 안정성
+- `@StateObject`/`@Observable` 초기화 시점 주의 (init이 무거우면 첫 frame 지연)
 
-## 콜드/웜/핫 차이
+## 측정 도구
 
-| 종류 | 정의 |
-|---|---|
-| **Cold launch** | 앱이 메모리에 없음. 모든 단계 전부 |
-| **Warm launch** | 앱은 종료됐지만 디스크 캐시 따끈 |
-| **Hot launch** | 백그라운드에서 다시 포그라운드 — 거의 즉시 |
+### Instruments → App Launch
 
-Cold가 가장 느리고, 사용자 첫 인상에 직접 영향.
+- Pre-main / main / first frame 단계별 시간 분해
+- *Mode of slowdown* 식별 (CPU bound vs IO bound)
 
-## 빠른 점검 리스트
+### MetricKit (`MXAppLaunchMetric`)
 
-- `didFinishLaunching` 안의 작업이 *정말* 메인 스레드에서 즉시 필요한가?
-- 글로벌 싱글턴들의 init이 무겁지는 않은가?
-- 동적 프레임워크 개수 (Build Phases → Embed Frameworks).
-- Storyboard launch screen이 첫 화면과 *연속적*인가? (튀는 인상 방지)
-- 첫 화면이 *네트워크 응답 없이* 먼저 보이는 구조인가? (skeleton/cached)
-- `+load`/Swift 글로벌 var가 무거운 일을 하지 않는가?
+- 실 사용자 디바이스의 *실제 launch time* 통계
+- p50/p90/p99 분포
+
+### Console.app → `os_log` signpost
+
+```swift
+let log = OSLog(subsystem: "app.launch", category: .pointsOfInterest)
+os_signpost(.begin, log: log, name: "init-network")
+// ...
+os_signpost(.end,   log: log, name: "init-network")
+```
+
+내가 직접 라벨링한 구간이 Instruments App Launch 트랙에 표시.
 
 ## 흔한 함정 / Follow-up
 
-- **Q. SDK 5개 동기 초기화로 1초 걸린다. 어떻게?**
-  필수만 즉시(예: 분석), 나머지는 첫 화면 후 background로 이동. *광고 SDK 같이 첫 화면 직전이 아니어도 되는 것*은 lazy.
+- **Q. 디버거 attach 시 측정?**
+  *디버거가 시간 추가*. 측정은 release + 디바이스 + 디버거 detach. TestFlight 빌드 권장.
 
-- **Q. SwiftUI App protocol에서 측정?**
-  `AppLaunch` Instruments + MetricKit 동일. SwiftUI는 `WindowGroup`의 첫 evaluation 시점이 first frame과 가깝다.
+- **Q. 시뮬레이터에서 실측 가능?**
+  *경향*은 보이지만 절대값은 디바이스와 다름. 결정은 디바이스 측정으로.
 
-- **Q. App Thinning, Bitcode, 사이즈와 런치?**
-  IPA 사이즈가 *직접* 런치에 영향 X (최초 다운로드 시간엔 영향). 다만 dylib 개수는 영향.
+- **Q. `@main`이 너무 빠르게 실행?**
+  `@main`은 main()의 wrapper. UIKit이면 SceneDelegate scene이 더 의미 있는 진입점.
 
-- **Q. Static vs Dynamic 라이브러리가 런치에 미치는 영향?**
-  Static은 main 안에 통합되어 dylib 로드 줄어들지만, 그만큼 `pre-main`이 짧아지고 `main` 시작은 동일/약간 길어질 수 있음. 일반적으로 *너무 많은 dylib* 보다 *적절한 static link*가 유리.
+- **Q. 첫 화면 로딩 도중 사용자 입력?**
+  *사용자 입력을 막지 않는 placeholder*가 best. blocking spinner는 마지막 수단.
 
-- **Q. *체감 런치*를 줄이는 트릭?**
-  Launch Screen을 첫 화면과 *닮게* 만들어 끊김을 가림. 첫 화면 자체에 placeholder/skeleton.
+- **Q. 시스템 SDK warmup도 필요?**
+  iOS 15+ 일부 framework은 *시스템 dyld cache*로 사실상 0 비용. 그러나 무거운 시스템 framework(Photos, AVKit) 첫 호출은 lazy 비용.
+
+- **Q. 백그라운드 fetch가 launch에 영향?**
+  Background fetch는 *full launch와 다른 path* — minimal context. 그러나 init code가 공유되면 영향 받음. Background context에서 *최소 분기*.
 
 ## 참고
 
 - WWDC 2019: Optimizing App Launch
-- WWDC 2022: Eliminate data races using Swift Concurrency (간접: 메인 격리로 첫 작업 명확화)
-- Apple Docs: Reducing Your App's Launch Time
+- WWDC 2022: Improve app size and runtime performance
+- Apple: Reducing Your App's Launch Time
+- MetricKit Documentation

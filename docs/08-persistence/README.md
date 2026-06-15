@@ -10,6 +10,10 @@
 - [Core Data와 SwiftData](core-data-and-swiftdata.md) — Stack, Context, 마이그레이션, SwiftData (iOS 17+)
 - [Core Data 마이그레이션 심화](core-data-migration.md) — *3년차+*. Lightweight / Heavyweight / Progressive
 
+## 시니어
+
+- [저장소 선택 가이드 (결정 트리 + Keychain 정책 + App Group + 마이그레이션)](storage-selection-guide.md)
+
 ## 저장소 선택 가이드
 
 | 데이터 | 저장소 |

@@ -7,6 +7,10 @@
 - [Mocking 전략](mocking.md) — Stub/Mock/Spy/Fake, protocol 추상화, URLProtocol 가짜 응답
 - [Snapshot / UI Testing](snapshot-and-ui-testing.md) — *3년차+*. 시각 회귀, XCUITest, page object, launchArguments
 
+## 시니어
+
+- [Test Strategy (피라미드 / Flaky 분류 / Snapshot이 놓치는 회귀 / Swift Testing vs XCTest)](test-strategy.md)
+
 ## 자주 묻는 질문
 
 - XCTest와 Swift Testing 차이 → [swift-testing.md](swift-testing.md)

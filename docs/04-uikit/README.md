@@ -13,6 +13,11 @@ UIKit 포지션이면 라이프사이클/Responder Chain은 100% 묻는다.
 - [Core Animation / CALayer](core-animation.md) — implicit/explicit animation, off-screen rendering
 - [렌더링 파이프라인](rendering-pipeline.md) — *3년차+*. 메인 → Render Server → GPU, off-screen pass
 
+## 시니어
+
+- [RunLoop 심화 — UIKit 메인 스레드의 동작 단위](runloop-deep.md)
+- [Off-Screen Rendering 트리거와 대응](offscreen-rendering.md)
+
 ## 관련 (다른 디렉토리)
 
 - 메인 스레드와 렌더링 파이프라인 → [03-concurrency/runloop-and-main-thread.md](../03-concurrency/runloop-and-main-thread.md)

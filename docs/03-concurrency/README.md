@@ -17,6 +17,11 @@ GCD부터 Swift Concurrency까지. 시기별 도구의 *왜*를 이해하는 것
 - [AsyncSequence / AsyncStream](async-sequence-and-stream.md)
 - [Swift 6 Strict Concurrency](swift6-strict.md)
 
+## 시니어
+
+- [Swift Concurrency Runtime (cooperative pool, executor, hop)](concurrency-runtime.md)
+- [Concurrency Pitfalls (reentrancy / priority inversion / blocking / continuation)](concurrency-pitfalls.md)
+
 ## 자주 묻는 질문
 
 - `DispatchQueue.main.sync`가 데드락 나는 이유 → [gcd.md](gcd.md)

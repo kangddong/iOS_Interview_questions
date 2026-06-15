@@ -7,6 +7,10 @@
 - [Code Signing](code-signing.md) — Certificate / Provisioning Profile / Entitlements, 흔한 에러
 - [CI/CD](ci-cd.md) — *3년차+*. Xcode Cloud / Fastlane / GitHub Actions, match 사이닝, TestFlight 자동화
 
+## 시니어
+
+- [Build Time 최적화 (모듈 분리, 타입 추론, 측정)](build-time-optimization.md) — incremental rebuild, BuildTime Analyzer, Tuist binary cache
+
 ## 자주 묻는 질문
 
 - Debug/Release 차이 → [xcode-build.md](xcode-build.md)

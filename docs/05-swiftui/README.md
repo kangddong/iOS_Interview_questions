@@ -15,6 +15,10 @@
 - [Custom Layout / Animatable / Transaction](custom-layout-and-animatable.md) — `Layout` 프로토콜, 보간, AnyLayout
 - [View Graph와 Diffing](view-graph-and-diffing.md) — ViewBuilder, Equatable 최적화, AnyView가 비싼 이유
 
+## 시니어
+
+- [SwiftUI Performance](performance.md) — drawingGroup, `.equatable()`, Lazy 컨테이너, state hoisting, `_printChanges`
+
 ## 자주 묻는 질문
 
 - `@StateObject` vs `@ObservedObject` → [state-management.md](state-management.md)
