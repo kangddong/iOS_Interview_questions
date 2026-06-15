@@ -1,7 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { AlertCircle, Compass, Flag, Sparkles } from "lucide-react";
 import { getAllTopics, getTopicsByCategory } from "@/lib/content";
 import { getAllProgress, getReviewQueue, getStats } from "@/lib/topic-progress";
+import { buildRecommendations, type TopicRec } from "@/lib/recommendations";
 
 export const dynamic = "force-dynamic";
 
@@ -31,15 +33,7 @@ export default function LearnPage() {
 
   const progressBySlug = new Map(progress.map((p) => [p.slug, p]));
 
-  // 추천 — 처음 보는 토픽 (해당 카테고리에서 진도 없는 첫 항목)
-  const recommendations = categories
-    .flatMap((cat) =>
-      cat.topics
-        .filter((t) => !progressBySlug.has(t.slug))
-        .slice(0, 1)
-        .map((t) => ({ category: cat.title, topic: t }))
-    )
-    .slice(0, 6);
+  const recs = buildRecommendations({ allTopics, categories });
 
   const lastStudied = progress.slice(0, 5);
 
@@ -75,22 +69,50 @@ export default function LearnPage() {
         </div>
       </div>
 
-      <section className="section-block">
-        <h2>처음 보는 토픽 추천</h2>
-        {recommendations.length === 0 ? (
-          <p className="muted">모든 카테고리의 첫 토픽을 학습했습니다. <Link href="/review">복습 큐</Link>로 이동하세요.</p>
-        ) : (
-          <div className="card-grid recommendation-grid">
-            {recommendations.map(({ category, topic }) => (
-              <Link key={topic.slug} href={`/topics/${topic.slug}`} className="learn-card">
-                <span className="card-eyebrow">{category}</span>
-                <strong>{topic.title}</strong>
-                <span className="card-meta">{topic.readingMinutes}분 읽기</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+      <RecBlock
+        title="놓친 부분 메우기"
+        hint="모의고사에서 틀린 / 채점 낮은 답변과 연결된 토픽"
+        items={recs.weakSpots}
+        Icon={AlertCircle}
+        accent="weak"
+        emptyHint="아직 시험 데이터가 없거나, 틀린 토픽이 모두 익힘 상태입니다."
+      />
+
+      <RecBlock
+        title="이어서 학습"
+        hint="가장 최근에 학습한 카테고리에서 남은 토픽"
+        items={recs.continuation}
+        Icon={Sparkles}
+        accent="continue"
+        emptyHint="진행 중인 카테고리가 없습니다. 아래 추천에서 시작해보세요."
+      />
+
+      <RecBlock
+        title="다음 영역으로"
+        hint="이미 시작한 카테고리들 중 우선 마무리할 곳"
+        items={recs.nextFrontier}
+        Icon={Compass}
+        accent="next"
+        emptyHint="진행 중인 다른 카테고리가 없습니다."
+      />
+
+      <RecBlock
+        title="새 영역 도전"
+        hint="아직 한 번도 안 본 카테고리의 시작 토픽"
+        items={recs.freshStart}
+        Icon={Flag}
+        accent="fresh"
+        emptyHint="모든 카테고리에 한 발을 들여놓았습니다."
+      />
+
+      {recs.weakSpots.length === 0 &&
+      recs.continuation.length === 0 &&
+      recs.nextFrontier.length === 0 &&
+      recs.freshStart.length === 0 ? (
+        <p className="muted">
+          모든 카테고리 진도가 완료됐습니다. <Link href="/review">복습 큐</Link>로 이동하세요.
+        </p>
+      ) : null}
 
       <section className="section-block">
         <h2>카테고리별 진도</h2>
@@ -137,6 +159,47 @@ export default function LearnPage() {
           </div>
         </section>
       ) : null}
+    </section>
+  );
+}
+
+interface RecBlockProps {
+  title: string;
+  hint: string;
+  items: TopicRec[];
+  Icon: typeof Sparkles;
+  accent: "weak" | "continue" | "next" | "fresh";
+  emptyHint: string;
+}
+
+function RecBlock({ title, hint, items, Icon, accent, emptyHint }: RecBlockProps) {
+  if (items.length === 0) {
+    return (
+      <section className={`section-block rec-block rec-${accent}`}>
+        <div className="rec-head">
+          <Icon size={18} aria-hidden="true" />
+          <h2>{title}</h2>
+        </div>
+        <p className="muted">{emptyHint}</p>
+      </section>
+    );
+  }
+  return (
+    <section className={`section-block rec-block rec-${accent}`}>
+      <div className="rec-head">
+        <Icon size={18} aria-hidden="true" />
+        <h2>{title}</h2>
+        <span className="rec-hint">{hint}</span>
+      </div>
+      <div className="card-grid recommendation-grid">
+        {items.map((rec) => (
+          <Link key={rec.slug} href={`/topics/${rec.slug}`} className="learn-card">
+            <span className="card-eyebrow">{rec.category}</span>
+            <strong>{rec.title}</strong>
+            <span className="card-meta">{rec.reason}</span>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }

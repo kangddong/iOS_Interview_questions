@@ -1338,3 +1338,25 @@ button {
   border-radius: 14px;
   color: var(--muted);
 }
+
+/* Recommendation blocks */
+.rec-block {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+.rec-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rec-head h2 { margin: 0; font-size: 18px; }
+.rec-hint { font-size: 13px; color: var(--muted); margin-left: auto; }
+.rec-block .recommendation-grid { margin-top: 10px; }
+
+.rec-weak     { border-left: 4px solid #ef4444; background: #fff7f7; }
+.rec-continue { border-left: 4px solid #2563eb; background: #f5f8ff; }
+.rec-next     { border-left: 4px solid #0ea5e9; background: #f0f9ff; }
+.rec-fresh    { border-left: 4px solid #10b981; background: #f0fdf4; }
