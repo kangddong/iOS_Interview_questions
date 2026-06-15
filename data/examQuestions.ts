@@ -1701,5 +1701,399 @@ export const objectiveExamQuestions: RawExamQuestion[] = [
     correctChoiceId: "a",
     explanation: "POP은 *능력을 조립*. 깊은 상속 트리의 fragile base class 문제를 회피.",
     relatedTopicSlugs: ["15-paradigms/oop", "01-swift-language/protocol-oriented-programming"]
+  },
+
+  // ===== Build System 시니어 =====
+  {
+    id: "objective-advanced-macho-001",
+    type: "objective",
+    level: "advanced",
+    category: "Build / Release",
+    prompt: "Mach-O 바이너리의 __TEXT 세그먼트의 일반적인 특성은?",
+    choices: [
+      { id: "a", text: "읽기 전용 + 실행 가능, 코드와 상수가 위치" },
+      { id: "b", text: "읽기/쓰기 가능, 전역 변수 저장" },
+      { id: "c", text: "동적 링크 정보만 저장" },
+      { id: "d", text: "디버그 심볼 전용 영역" }
+    ],
+    correctChoiceId: "a",
+    explanation: "__TEXT는 r-x. 코드(__text)와 상수 문자열(__cstring) 등. __DATA가 r/w, __LINKEDIT가 dyld 메타.",
+    relatedTopicSlugs: ["11-build-system/mach-o-and-binary"]
+  },
+  {
+    id: "objective-advanced-macho-002",
+    type: "objective",
+    level: "advanced",
+    category: "Build / Release",
+    prompt: "static library와 dynamic library의 런치 타임 차이는?",
+    choices: [
+      { id: "a", text: "static은 단일 바이너리로 통합되어 dyld 단계 비용 감소, dynamic은 dylib 수에 비례한 bind/rebase" },
+      { id: "b", text: "둘은 동일한 비용" },
+      { id: "c", text: "dynamic이 항상 더 빠르다" },
+      { id: "d", text: "static은 런타임에 reload가 필요" }
+    ],
+    correctChoiceId: "a",
+    explanation: "embedded dylib 수가 많을수록 dyld 단계 시간 증가. Release에서 static 링크가 런치 시간 단축의 큰 지렛대.",
+    relatedTopicSlugs: ["11-build-system/static-vs-dynamic-libraries", "11-build-system/linker-and-dyld", "10-performance/launch-time"]
+  },
+  {
+    id: "objective-advanced-dyld-003",
+    type: "objective",
+    level: "advanced",
+    category: "Build / Release",
+    prompt: "dyld의 rebase 단계가 하는 일은?",
+    choices: [
+      { id: "a", text: "ASLR로 인한 임의 주소 변환을 위해 *내부 포인터를 실제 로드 주소에 맞게 재계산*" },
+      { id: "b", text: "동적 심볼을 외부 라이브러리에서 찾음" },
+      { id: "c", text: "디버그 심볼을 dSYM에 작성" },
+      { id: "d", text: "C++ vtable을 초기화" }
+    ],
+    correctChoiceId: "a",
+    explanation: "rebase = 내부 절대 주소 보정. bind = 외부 심볼 해결. dyld 3+ 캐시와 chained fixups가 이 비용을 크게 줄임.",
+    relatedTopicSlugs: ["11-build-system/linker-and-dyld", "11-build-system/mach-o-and-binary"]
+  },
+  {
+    id: "objective-intermediate-framework-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Build / Release",
+    prompt: "XCFramework가 fat binary 대비 갖는 강점은?",
+    choices: [
+      { id: "a", text: "여러 *platform/아키텍처*를 한 번들에 담아 시뮬레이터/디바이스/macOS 등을 동시에 배포" },
+      { id: "b", text: "바이너리 크기가 항상 더 작다" },
+      { id: "c", text: "런타임 dyld 비용이 0이 된다" },
+      { id: "d", text: "Swift Package Manager 전용 포맷" }
+    ],
+    correctChoiceId: "a",
+    explanation: "fat binary는 같은 platform의 다중 arch만. XCFramework는 platform+variant 별 slice를 갖는 정식 배포 포맷.",
+    relatedTopicSlugs: ["11-build-system/framework-vs-library"]
+  },
+
+  // ===== Networking 구현 시니어 =====
+  {
+    id: "objective-intermediate-interceptor-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Networking",
+    prompt: "Request Interceptor (middleware) 패턴의 핵심 이점은?",
+    choices: [
+      { id: "a", text: "인증/로깅/재시도 같은 *공통 관심사*를 호출부에 흩뿌리지 않고 파이프라인으로 합성" },
+      { id: "b", text: "URLSession을 자동으로 비동기로 만든다" },
+      { id: "c", text: "응답 캐시를 강제 활성화한다" },
+      { id: "d", text: "Codable 디코딩 비용을 0으로 만든다" }
+    ],
+    correctChoiceId: "a",
+    explanation: "Adapter/Interceptor가 요청에 토큰/헤더 첨부, 응답 후 로깅/refresh를 일관되게 적용. Alamofire의 RequestAdapter/Retrier가 대표 사례.",
+    relatedTopicSlugs: ["07-networking/request-interceptor"]
+  },
+  {
+    id: "objective-advanced-oauth-001",
+    type: "objective",
+    level: "advanced",
+    category: "Networking",
+    prompt: "OAuth 2.0 Authorization Code flow에서 PKCE를 사용하는 이유는?",
+    choices: [
+      { id: "a", text: "client secret을 둘 수 없는 모바일 환경에서 *authorization code 가로채기 공격*을 방어" },
+      { id: "b", text: "토큰 만료를 자동 갱신" },
+      { id: "c", text: "ID token 서명을 추가" },
+      { id: "d", text: "refresh token 회전을 강제" }
+    ],
+    correctChoiceId: "a",
+    explanation: "code_verifier/code_challenge로 *code 발급-교환 사이* 가로채기를 차단. 모바일/SPA에 사실상 필수.",
+    relatedTopicSlugs: ["07-networking/oauth-and-jwt"]
+  },
+  {
+    id: "objective-advanced-jwt-002",
+    type: "objective",
+    level: "advanced",
+    category: "Networking",
+    prompt: "JWT의 alg: none 공격에 대한 올바른 대응은?",
+    choices: [
+      { id: "a", text: "서버가 *알고리즘 화이트리스트*로 허용 alg를 강제하고 none을 거부" },
+      { id: "b", text: "header.alg를 신뢰하고 그대로 검증" },
+      { id: "c", text: "클라이언트가 JWT를 매번 재발급" },
+      { id: "d", text: "payload만 사용하고 signature는 무시" }
+    ],
+    correctChoiceId: "a",
+    explanation: "header.alg를 *그대로 신뢰*하면 공격자가 none으로 위조 가능. 서버에서 alg 화이트리스트 강제가 표준.",
+    relatedTopicSlugs: ["07-networking/oauth-and-jwt"]
+  },
+  {
+    id: "objective-intermediate-retry-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Networking",
+    prompt: "지수 백오프에 jitter를 더하는 이유는?",
+    choices: [
+      { id: "a", text: "여러 클라이언트의 동시 재시도가 *thundering herd*로 몰리는 것을 방지" },
+      { id: "b", text: "백오프 시간을 평균적으로 줄이기 위해" },
+      { id: "c", text: "서버의 응답 캐시 hit률을 높이기 위해" },
+      { id: "d", text: "TLS handshake를 생략하기 위해" }
+    ],
+    correctChoiceId: "a",
+    explanation: "동일 timing 재시도는 서버에 폭주. full jitter (0~max) 또는 equal jitter로 분산.",
+    relatedTopicSlugs: ["07-networking/retry-and-circuit-breaker", "07-networking/background-tasks-and-retry"]
+  },
+  {
+    id: "objective-advanced-circuit-002",
+    type: "objective",
+    level: "advanced",
+    category: "Networking",
+    prompt: "Circuit Breaker 패턴의 *half-open* 상태가 하는 역할은?",
+    choices: [
+      { id: "a", text: "open 후 일정 시간 뒤 *소수 요청*만 허용해 서비스 회복 여부 탐지" },
+      { id: "b", text: "모든 요청을 즉시 차단" },
+      { id: "c", text: "응답 캐시만 반환" },
+      { id: "d", text: "재시도 횟수를 0으로 리셋" }
+    ],
+    correctChoiceId: "a",
+    explanation: "half-open은 *probe 단계*. 성공 시 closed로, 실패 시 다시 open으로. 서버 회복과 동기화.",
+    relatedTopicSlugs: ["07-networking/retry-and-circuit-breaker"]
+  },
+  {
+    id: "objective-intermediate-apiclient-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Networking",
+    prompt: "Generic Endpoint protocol + associatedtype Response의 강점은?",
+    choices: [
+      { id: "a", text: "*컴파일 타임*에 endpoint별 응답 타입을 강제해 호출부 디코딩 실수 차단" },
+      { id: "b", text: "URLSession보다 빠른 실행" },
+      { id: "c", text: "응답이 자동으로 캐시됨" },
+      { id: "d", text: "ObjC와의 자동 호환" }
+    ],
+    correctChoiceId: "a",
+    explanation: "type-safe API 클라이언트의 핵심. send(endpoint) → 자동으로 Endpoint.Response 반환.",
+    relatedTopicSlugs: ["07-networking/api-client-design"]
+  },
+
+  // ===== Codable / JSON 시니어 =====
+  {
+    id: "objective-intermediate-codable-deep-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Networking",
+    prompt: "JSONDecoder의 .convertFromSnakeCase와 CodingKeys를 함께 쓸 때 충돌하는 동작은?",
+    choices: [
+      { id: "a", text: "CodingKeys의 raw value가 우선 적용되어 자동 변환이 무시됨" },
+      { id: "b", text: "둘 다 적용되어 키가 이중 변환됨" },
+      { id: "c", text: "디코딩 시 fatalError" },
+      { id: "d", text: "두 정책이 무작위로 선택" }
+    ],
+    correctChoiceId: "a",
+    explanation: "CodingKeys 명시값이 우선. 일부 필드만 예외 처리하려면 CodingKeys를 그 필드에만 정의.",
+    relatedTopicSlugs: ["07-networking/json-strategies", "07-networking/codable"]
+  },
+  {
+    id: "objective-advanced-codable-deep-002",
+    type: "objective",
+    level: "advanced",
+    category: "Networking",
+    prompt: "다음 중 Codable에서 *3종 Container* 분류로 옳은 것은?",
+    choices: [
+      { id: "a", text: "Keyed / Unkeyed / SingleValue" },
+      { id: "b", text: "JSON / Plist / Binary" },
+      { id: "c", text: "Encode / Decode / Validate" },
+      { id: "d", text: "Synchronous / Async / Throwing" }
+    ],
+    correctChoiceId: "a",
+    explanation: "KeyedContainer(객체), UnkeyedContainer(배열), SingleValueContainer(scalar). nested 컨테이너로 깊은 구조 탐색.",
+    relatedTopicSlugs: ["07-networking/codable-deep"]
+  },
+  {
+    id: "objective-intermediate-dto-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Networking",
+    prompt: "DTO와 Domain Model을 분리하는 핵심 이유는?",
+    choices: [
+      { id: "a", text: "서버 schema 변경이 *도메인 코드 전체*로 전파되지 않도록 경계를 둠" },
+      { id: "b", text: "DTO가 더 빠른 디코딩을 보장" },
+      { id: "c", text: "Codable이 강제하는 규약" },
+      { id: "d", text: "메모리 사용량 감소" }
+    ],
+    correctChoiceId: "a",
+    explanation: "DTO는 *wire format*, Domain은 *비즈니스 규칙*. Mapper로 변환해 도메인을 외부 변경에서 격리.",
+    relatedTopicSlugs: ["07-networking/dto-pattern"]
+  },
+  {
+    id: "objective-advanced-poly-001",
+    type: "objective",
+    level: "advanced",
+    category: "Networking",
+    prompt: "Discriminated Union(type 필드 기반) 디코딩에서 *향후 호환성*을 확보하는 방법은?",
+    choices: [
+      { id: "a", text: "알 수 없는 type 값을 .unknown 케이스로 디코딩해 forward-compatible하게 처리" },
+      { id: "b", text: "type이 없으면 fatalError" },
+      { id: "c", text: "type 값을 무시하고 첫 번째 변형으로 강제 디코딩" },
+      { id: "d", text: "디코딩을 동기로 전환" }
+    ],
+    correctChoiceId: "a",
+    explanation: "서버가 새 type을 추가해도 클라이언트가 깨지지 않게 *unknown 케이스 + 안전한 폴백*. 부분 실패 정책 명시.",
+    relatedTopicSlugs: ["07-networking/custom-codable-polymorphism"]
+  },
+
+  // ===== Persistence 시니어 =====
+  {
+    id: "objective-intermediate-cache-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Networking / Persistence",
+    prompt: "NSCache가 일반 Dictionary와 다른 핵심 특성은?",
+    choices: [
+      { id: "a", text: "메모리 압박 시 *자동으로 항목 제거*, thread-safe, total cost limit 지원" },
+      { id: "b", text: "디스크에 자동 저장" },
+      { id: "c", text: "key가 항상 String이어야 함" },
+      { id: "d", text: "iCloud와 자동 동기화" }
+    ],
+    correctChoiceId: "a",
+    explanation: "NSCache는 OS의 메모리 압박과 협력. Dictionary는 무한 누적. 이미지 캐시 메모리 계층에 자주 사용.",
+    relatedTopicSlugs: ["08-persistence/memory-and-disk-cache"]
+  },
+  {
+    id: "objective-advanced-cache-002",
+    type: "objective",
+    level: "advanced",
+    category: "Networking / Persistence",
+    prompt: "stale-while-revalidate (SWR) 전략의 의미는?",
+    choices: [
+      { id: "a", text: "캐시된 *오래된 값*을 즉시 반환하면서 *백그라운드에서 갱신*해 다음 요청에 신선한 값을 제공" },
+      { id: "b", text: "캐시를 절대 무효화하지 않음" },
+      { id: "c", text: "캐시가 만료될 때만 응답을 반환" },
+      { id: "d", text: "모든 요청을 서버로 보내고 캐시는 보조" }
+    ],
+    correctChoiceId: "a",
+    explanation: "체감 응답 속도 ↑ + 데이터 신선도 유지. RFC 5861. URLCache + 직접 구현 결합으로 모바일에 자주 쓰임.",
+    relatedTopicSlugs: ["08-persistence/cache-strategy-and-invalidation"]
+  },
+  {
+    id: "objective-advanced-migration-001",
+    type: "objective",
+    level: "advanced",
+    category: "Networking / Persistence",
+    prompt: "Core Data의 Progressive Migration이 *단일* Heavyweight Migration보다 유리한 경우는?",
+    choices: [
+      { id: "a", text: "여러 버전을 한 번에 건너뛰는 대량 데이터에서 *단계별 적용*으로 메모리/시간 부담 분산" },
+      { id: "b", text: "사용자 데이터가 거의 없을 때" },
+      { id: "c", text: "schema 변경이 단순 컬럼 추가일 때" },
+      { id: "d", text: "iCloud 동기화를 끌 때" }
+    ],
+    correctChoiceId: "a",
+    explanation: "v1→v2→v3→v4를 한 번에 처리 시 OOM 위험. progressive로 *각 단계 적용 + 검증* 반복.",
+    relatedTopicSlugs: ["08-persistence/migration-strategy", "08-persistence/core-data-migration"]
+  },
+  {
+    id: "objective-advanced-persistperf-001",
+    type: "objective",
+    level: "advanced",
+    category: "Networking / Persistence",
+    prompt: "Core Data 대량 insert 성능을 가장 크게 좌우하는 요소는?",
+    choices: [
+      { id: "a", text: "*배치 크기*와 *save 빈도*, 백그라운드 context 사용 여부" },
+      { id: "b", text: "viewContext에서 동기로 실행" },
+      { id: "c", text: "main thread에서 처리" },
+      { id: "d", text: "fault를 미리 모두 해소" }
+    ],
+    correctChoiceId: "a",
+    explanation: "batch insert + 백그라운드 context + 적절한 save 간격(1k~10k)이 표준. Instruments로 측정.",
+    relatedTopicSlugs: ["08-persistence/persistence-performance", "08-persistence/core-data-and-swiftdata"]
+  },
+
+  // ===== Real-World iOS =====
+  {
+    id: "objective-basic-push-001",
+    type: "objective",
+    level: "basic",
+    category: "Real-World iOS",
+    prompt: "APNs에서 silent push의 목적은?",
+    choices: [
+      { id: "a", text: "사용자에게 *알림을 표시하지 않고* 백그라운드 fetch/sync 같은 작업을 트리거" },
+      { id: "b", text: "긴급 알림을 음소거로 표시" },
+      { id: "c", text: "알림 음을 무음으로 설정" },
+      { id: "d", text: "iCloud 동기화 전용 채널" }
+    ],
+    correctChoiceId: "a",
+    explanation: "content-available: 1 payload. UI 변경 없이 데이터 갱신 가능. 단 OS의 throttling 정책 인지.",
+    relatedTopicSlugs: ["16-real-world/push-notification"]
+  },
+  {
+    id: "objective-intermediate-push-002",
+    type: "objective",
+    level: "intermediate",
+    category: "Real-World iOS",
+    prompt: "Notification Service Extension의 주요 용도는?",
+    choices: [
+      { id: "a", text: "암호화된 payload 복호화, 동적 이미지/미디어 첨부 등 *수신 시점 변형*" },
+      { id: "b", text: "푸시 토큰 발급" },
+      { id: "c", text: "알림을 자동으로 닫음" },
+      { id: "d", text: "알림 음을 변경" }
+    ],
+    correctChoiceId: "a",
+    explanation: "Service Extension은 *알림 표시 직전* 동작. 30초 제한. 미디어 첨부, 번역, E2E 복호화 등.",
+    relatedTopicSlugs: ["16-real-world/push-notification"]
+  },
+  {
+    id: "objective-intermediate-deeplink-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Real-World iOS",
+    prompt: "Universal Links가 Custom URL Scheme 대비 갖는 강점은?",
+    choices: [
+      { id: "a", text: "*HTTPS URL*이라 가로채기 방지 + 앱 미설치 시 자동으로 웹으로 폴백" },
+      { id: "b", text: "더 짧은 URL을 사용 가능" },
+      { id: "c", text: "JavaScript 없이 동작" },
+      { id: "d", text: "App Store 검색에서 우선 노출" }
+    ],
+    correctChoiceId: "a",
+    explanation: "apple-app-site-association 파일로 도메인 소유 증명. Custom scheme은 다른 앱이 가로챌 수 있고 미설치 폴백 없음.",
+    relatedTopicSlugs: ["16-real-world/deep-linking-and-universal-links"]
+  },
+  {
+    id: "objective-intermediate-flag-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Real-World iOS",
+    prompt: "원격 feature flag fetch를 *동기로* 처리하면 안 되는 이유는?",
+    choices: [
+      { id: "a", text: "런치 타임 차단 + 네트워크 실패 시 앱 시작 불가 → 캐시된 값으로 시작하고 async 갱신" },
+      { id: "b", text: "보안 정책상 동기 호출이 금지" },
+      { id: "c", text: "flag 값이 항상 false로 초기화" },
+      { id: "d", text: "OS가 자동으로 throw" }
+    ],
+    correctChoiceId: "a",
+    explanation: "캐시된 마지막 값으로 시작 + 다음 부팅에 반영하는 *eventually consistent* 패턴이 표준.",
+    relatedTopicSlugs: ["16-real-world/feature-flag-and-remote-config", "10-performance/launch-time"]
+  },
+  {
+    id: "objective-intermediate-i18n-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Real-World iOS",
+    prompt: "iOS 17+의 String Catalog (.xcstrings)가 기존 Localizable.strings 대비 갖는 강점은?",
+    choices: [
+      { id: "a", text: "*복수형/변형/주석*을 한 파일에서 시각 편집 + 자동 추출 + 미번역 추적" },
+      { id: "b", text: "런타임 로딩이 더 빠름" },
+      { id: "c", text: "Xcode 없이도 편집 가능" },
+      { id: "d", text: "기존 strings 파일과 호환되지 않음" }
+    ],
+    correctChoiceId: "a",
+    explanation: "WWDC 2023. plural rule(zero/one/two/few/many/other), device variant, 자동 키 추출 등. .strings도 함께 동작.",
+    relatedTopicSlugs: ["16-real-world/localization-and-i18n"]
+  },
+  {
+    id: "objective-intermediate-a11y-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Real-World iOS",
+    prompt: "accessibilityIdentifier와 accessibilityLabel의 차이는?",
+    choices: [
+      { id: "a", text: "Identifier는 *UI 테스트용 안정 키*, Label은 *VoiceOver가 읽는 사용자 텍스트*" },
+      { id: "b", text: "둘은 동일한 기능" },
+      { id: "c", text: "Identifier는 시각 사용자용 라벨" },
+      { id: "d", text: "Label은 ObjC 전용" }
+    ],
+    correctChoiceId: "a",
+    explanation: "Identifier는 i18n에 깨지지 않는 selector용. Label은 i18n 대상. XCUITest는 Identifier로 요소를 찾는 게 안정적.",
+    relatedTopicSlugs: ["16-real-world/accessibility", "09-testing/snapshot-and-ui-testing"]
   }
 ];

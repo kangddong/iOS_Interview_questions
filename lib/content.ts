@@ -102,6 +102,12 @@ export const CATEGORIES: CategoryMeta[] = [
     title: "Paradigms",
     description: "OOP, FP, 명령형 vs 선언형, Swift의 멀티 패러다임",
     order: 15
+  },
+  {
+    id: "16-real-world",
+    title: "Real-World iOS",
+    description: "푸시, 딥링크, feature flag, i18n, 접근성 등 실무 구현",
+    order: 16
   }
 ];
 

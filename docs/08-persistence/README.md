@@ -13,6 +13,10 @@
 ## 시니어
 
 - [저장소 선택 가이드 (결정 트리 + Keychain 정책 + App Group + 마이그레이션)](storage-selection-guide.md)
+- [메모리 / 디스크 캐시 (NSCache · URLCache · LRU disk)](memory-and-disk-cache.md)
+- [캐시 전략 · 무효화 (TTL · ETag · LRU/LFU/ARC · SWR)](cache-strategy-and-invalidation.md)
+- [저장소 마이그레이션 전략 (UserDefaults · Keychain · Core Data · SwiftData)](migration-strategy.md)
+- [저장소 성능 비교 · 측정 (Instruments + signpost + batch I/O)](persistence-performance.md)
 
 ## 저장소 선택 가이드
 
