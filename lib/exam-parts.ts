@@ -22,6 +22,7 @@ export const EXAM_PARTS: ExamPart[] = [
   { id: "scenario",     label: "통합 시나리오",            match: /시나리오|Scenario/i },
   { id: "paradigms",    label: "Paradigms (OOP/FP)",     match: /Paradigm|OOP|FP/i },
   { id: "realworld",    label: "Real-World iOS",         match: /Real-World|RealWorld|실무/i },
+  { id: "objc",         label: "Objective-C",            match: /Objective-C|ObjC/i },
   { id: "etc",          label: "기타",                    match: /기타/i },
 ];
 
@@ -55,6 +56,7 @@ const CATEGORY_TO_PART: Record<string, string> = {
   "14-network":            "network",
   "15-paradigms":          "paradigms",
   "16-real-world":         "realworld",
+  "17-objective-c":        "objc",
 };
 
 export function partIdForCategory(categoryId: string): string | undefined {

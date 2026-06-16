@@ -63,6 +63,14 @@ class Child { var delegate: XDelegate? }   // ❌ strong delegate
 - **Q. cycle과 leak의 차이?**
   cycle은 leak의 한 종류. leak은 *도달 가능하지 않은데 해제되지 않은 메모리* 일반.
 
+## Objective-C 비교
+
+- ObjC도 동일하게 cycle은 자동 해결되지 않는다. `__weak` ivar/property로 끊는다.
+- **Block에서 self 캡처**: Swift `[weak self]`에 해당하는 ObjC 패턴은 `__weak typeof(self) weakSelf = self;`. block 실행 도중 self가 살아있어야 하면 진입부에서 `__strong typeof(self) strongSelf = weakSelf;`로 재포착.
+- **delegate**: 두 언어 모두 `weak` 보유 + protocol은 class-bound (Swift `: AnyObject`, ObjC `<NSObject>`).
+- 디버깅 도구도 동일 — Memory Graph Debugger, Leaks instrument는 ObjC/Swift 가리지 않고 작동.
+- 더 깊게: [17-objective-c/blocks](../17-objective-c/blocks.md) (block 캡처와 cycle)
+
 ## 참고
 
 - Swift Language Guide: Strong Reference Cycles Between Class Instances

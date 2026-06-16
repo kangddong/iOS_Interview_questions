@@ -127,6 +127,56 @@ SwiftUI에서 데이터 모델 변경 알림? → @Observable / @Published
 - **Q. 같은 Notification을 두 번 받는다.**
   observer를 한 객체에서 *두 번 등록*. addObserver 호출 위치 확인. selector 기반은 매번 새 등록 가능.
 
+## Objective-C 비교
+
+ObjC 시절 Observer는 사실상 **NotificationCenter + KVO** 두 가지뿐이었다.
+
+### NotificationCenter
+
+```objc
+// 발신
+[[NSNotificationCenter defaultCenter] postNotificationName:@"DidLogin"
+                                                    object:nil
+                                                  userInfo:@{@"userID": @"u1"}];
+
+// 수신 (selector 기반)
+[[NSNotificationCenter defaultCenter] addObserver:self
+                                         selector:@selector(didLogin:)
+                                             name:@"DidLogin"
+                                           object:nil];
+
+- (void)didLogin:(NSNotification *)note {
+    NSString *uid = note.userInfo[@"userID"];
+}
+
+// 해제 (필수)
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+```
+
+Swift block-based API(`addObserver(forName:object:queue:using:)`)는 ObjC에도 동일하게 존재했고, 옛 코드일수록 selector 기반이 많다.
+
+### KVO
+
+```objc
+static void *kStatusCtx = &kStatusCtx;
+
+[player addObserver:self forKeyPath:@"status"
+            options:NSKeyValueObservingOptionNew context:kStatusCtx];
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                        change:(NSDictionary *)change context:(void *)context {
+    if (context == kStatusCtx) { ... }
+    else { [super observeValueForKeyPath:keyPath ofObject:object change:change context:context]; }
+}
+```
+
+- ObjC 시절 KVO는 string keypath라 오타에 약했다. Swift `\.status` KeyPath로 타입 안전 ↑.
+- Swift에서 KVO를 쓰려면 `NSObject` 상속 + `@objc dynamic` 필수 — ObjC 런타임 의존성이 그대로 노출된다.
+- ObjC 시절엔 Combine/AsyncSequence가 없어서 *값 흐름*을 표현하려면 KVO + NotificationCenter + manual callback property 조합으로 직접 짜야 했음.
+- 더 깊게: [17-objective-c/kvo-kvc](../../17-objective-c/kvo-kvc.md) (isa-swizzling 메커니즘)
+
 ## 참고
 
 - Apple Docs: Notifications, KVO, Combine

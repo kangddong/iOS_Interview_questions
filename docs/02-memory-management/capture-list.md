@@ -112,6 +112,21 @@ UIView.animate(withDuration: 0.3) { self.alpha = 0 }
 - **Q. `[self]`처럼 쓰면?**
   Swift 5.4+에서 closure 안에서 self.* 생략 시 명시적 strong 캡처. retain cycle 위험은 동일. iOS Async UI 코드에선 `[weak self]`를 쓰는 게 보통.
 
+## Objective-C 비교
+
+ObjC Block의 캡처 의미가 Swift Closure와 *반대* 방향이라 헷갈리기 쉽다.
+
+| 항목 | Swift Closure | ObjC Block |
+|---|---|---|
+| 기본 캡처 | reference (let은 immutable 참조) | const copy (값 복사, immutable) |
+| mutable 캡처 | `var` 캡처 (`[counter]`로 값 고정 가능) | `__block` 키워드 필요 |
+| 약참조 캡처 | `[weak self]` | `__weak typeof(self) weakSelf = self;` |
+| double-strong 패턴 | `guard let self else { return }` | `__strong typeof(self) strongSelf = weakSelf;` |
+| escaping 표기 | `@escaping` (명시) | 항상 escaping (별도 표기 없음) |
+| 메모리 위치 | heap (escaping 시) | stack → heap copy (대입/`Block_copy` 시) |
+
+- 더 깊게: [17-objective-c/blocks](../17-objective-c/blocks.md)
+
 ## 참고
 
 - Swift Language Guide: Strong Reference Cycles for Closures

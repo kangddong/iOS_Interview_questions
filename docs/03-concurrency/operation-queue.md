@@ -67,6 +67,20 @@ queue.addOperations([download, parse, display], waitUntilFinished: false)
 - **Q. `maxConcurrentOperationCount = 1`이면 시리얼 큐?**
   맞다. GCD의 시리얼 큐와 비슷한 동작.
 
+## Objective-C 비교
+
+- ObjC의 원래 이름은 **`NSOperation` / `NSOperationQueue`**. Swift 3에서 `NS` prefix가 떨어지며 `Operation` / `OperationQueue`로 노출.
+- ObjC 시절 비동기 Operation 서브클래싱은 다음을 직접 KVO 호출해야 했다:
+  ```objc
+  [self willChangeValueForKey:@"isExecuting"];
+  _executing = YES;
+  [self didChangeValueForKey:@"isExecuting"];
+  ```
+  KVO 기반 상태 머신이라 코드량이 많았다.
+- WWDC 2015 "Advanced NSOperations"는 ObjC 시대의 정점 — depencency-driven UI workflow.
+- 현대 Swift에선 async/await + TaskGroup이 거의 대체.
+- 더 깊게: [17-objective-c/kvo-kvc](../../17-objective-c/kvo-kvc.md)
+
 ## 참고
 
 - Apple Docs: OperationQueue

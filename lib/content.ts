@@ -108,6 +108,12 @@ export const CATEGORIES: CategoryMeta[] = [
     title: "Real-World iOS",
     description: "푸시, 딥링크, feature flag, i18n, 접근성 등 실무 구현",
     order: 16
+  },
+  {
+    id: "17-objective-c",
+    title: "Objective-C",
+    description: "ARC/MRC, 프로퍼티 한정자, Blocks, 런타임, KVO, Swift interop",
+    order: 17
   }
 ];
 

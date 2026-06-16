@@ -103,6 +103,18 @@ override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
 - **Q. `nextResponder()`는?**
   현재 responder의 다음을 반환. UIView는 보통 superview, root view는 viewController. 디버깅 시 chain을 출력해 볼 수 있다.
 
+## Objective-C 비교
+
+- Responder Chain은 ObjC AppKit/UIKit이 만든 패턴 — `UIResponder`/`NSResponder` 클래스 자체가 ObjC 클래스.
+- target-action의 `nil` target은 사실상 responder chain을 위한 selector 라우팅:
+  ```objc
+  [UIApplication.sharedApplication sendAction:@selector(copy:) to:nil from:self forEvent:nil];
+  ```
+  현재 first responder부터 chain을 따라가며 `respondsToSelector:@selector(copy:)`인 객체에 메시지를 보낸다. (`UIMenuController`/`UIEditMenuInteraction`의 copy/paste 메커니즘)
+- `hitTest:withEvent:` / `pointInside:withEvent:`도 ObjC 시절 시그니처 그대로. Swift에선 `hitTest(_:with:)`로 이름만 변환.
+- ObjC `UIResponder`의 인터페이스는 `<UIResponderStandardEditActions>` protocol에서 `cut:`/`copy:`/`paste:` 같은 표준 selector들을 정의.
+- 더 깊게: [17-objective-c/method-dispatch](../../17-objective-c/method-dispatch.md) (responder chain은 결국 selector lookup의 응용)
+
 ## 참고
 
 - Apple Docs: Using Responders and the Responder Chain to Handle Events

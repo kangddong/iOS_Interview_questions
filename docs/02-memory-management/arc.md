@@ -54,6 +54,15 @@ do {
 - **Q. ARC가 retain cycle을 못 잡는 이유?**
   cycle 안에서는 서로가 서로를 살리므로 count가 0이 되지 않음. *도달 가능성*을 추적하는 GC만 잡아낼 수 있음.
 
+## Objective-C 비교
+
+- **출발점이 같다** — Swift ARC는 ObjC ARC를 그대로 가져왔다. retain/release 호출 삽입 + 결정적 해제.
+- **MRC 시절**: `[obj retain]` / `[obj release]` / `[obj autorelease]`를 직접 호출. NARC 규칙(`new`/`alloc`/`retain`/`copy`로 받으면 본인이 release 책임).
+- **dealloc**: ObjC ARC도 `[super dealloc]` 호출 금지. Swift `deinit`과 의미 동일.
+- **`__strong`/`__weak`/`__unsafe_unretained`** = `strong`/`weak`/`unowned(unsafe)`.
+- **혼합 코드**: ObjC `__weak` 객체를 Swift `weak`로 받거나 그 반대 모두 가능 (런타임이 동일한 weak table 공유).
+- 더 깊게: [17-objective-c/arc-and-mrc](../17-objective-c/arc-and-mrc.md)
+
 ## 참고
 
 - Swift Language Guide: Automatic Reference Counting

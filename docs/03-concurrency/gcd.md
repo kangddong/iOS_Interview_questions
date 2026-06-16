@@ -105,6 +105,33 @@ group.notify(queue: .main) { print("둘 다 끝") }
 - **Q. `DispatchQueue(label:)` 기본 속성은?**
   시리얼. 컨커런트로 만들려면 `attributes: .concurrent` 명시.
 
+## Objective-C 비교
+
+GCD는 ObjC가 주류이던 시절 등장(iOS 4)했으므로 ObjC와 Swift API가 거의 동일한 모양.
+
+```objc
+dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+    NSData *data = [self heavyWork];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.label.text = [self stringify:data];
+    });
+});
+```
+
+```swift
+DispatchQueue.global(qos: .userInitiated).async {
+    let data = self.heavyWork()
+    DispatchQueue.main.async {
+        self.label.text = self.stringify(data)
+    }
+}
+```
+
+- ObjC block의 `__weak self` / `__strong strongSelf` 패턴 = Swift `[weak self]` + `guard let self`.
+- ObjC 시절에는 GCD가 사실상 *유일한 권장 동시성 API*였고, NSOperation은 객체 지향 wrapper로 등장.
+- Swift 5.5+의 async/await가 등장하기 전까지 모든 비동기 코드는 GCD callback 형태였다.
+- 더 깊게: [17-objective-c/blocks](../../17-objective-c/blocks.md) (block과 GCD)
+
 ## 참고
 
 - Apple Docs: Dispatch

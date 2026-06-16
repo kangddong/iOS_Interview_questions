@@ -109,6 +109,36 @@ UIKit delegate는 거의 1:1. 여러 구독은 NotificationCenter/Combine 같은
 - **Q. 같은 delegate를 두 개 객체가 share하면?**
   보통 안 함. 필요하면 *멀티 delegate 매니저* 패턴 또는 NotificationCenter.
 
+## Objective-C 비교
+
+Delegate 패턴 자체가 ObjC Cocoa의 핵심 패턴 — Swift는 그대로 가져왔다.
+
+```objc
+@protocol UserListDelegate <NSObject>
+@required
+- (void)userList:(UserListVC *)list didSelectUser:(User *)user;
+@optional
+- (void)userListDidScroll:(UserListVC *)list;
+@end
+
+@interface UserListVC : UIViewController
+@property (nonatomic, weak) id<UserListDelegate> delegate;
+@end
+```
+
+| 항목 | Swift | Objective-C |
+|---|---|---|
+| Class-only 제약 | `: AnyObject` | `<NSObject>` 상속 |
+| weak 보유 | `weak var delegate: P?` | `@property (weak) id<P> delegate;` |
+| optional 메서드 | `@objc optional func ...` 또는 extension default | `@optional` |
+| nil 호출 안전 | 옵셔널 chaining `delegate?.foo()` | nil messaging (자동 safe) + `respondsToSelector:` |
+| 호출 전 체크 | 자연스러움 | `[self.delegate respondsToSelector:@selector(...)]` 필수 |
+
+- ObjC에서 protocol에 `<NSObject>` 상속이 관례인 이유: `respondsToSelector:` 같은 NSObject 메서드를 호출하기 위해.
+- ObjC delegate `weak` 사용은 Swift와 동일 — retain cycle 방지.
+- UIKit `UITableViewDelegate` 같은 큰 protocol은 Swift로 와도 형태가 거의 동일.
+- 더 깊게: [17-objective-c/protocols](../../17-objective-c/protocols.md)
+
 ## 참고
 
 - Apple Docs: Delegation

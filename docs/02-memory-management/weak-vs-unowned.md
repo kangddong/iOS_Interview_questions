@@ -64,6 +64,18 @@ class Card {
 - **Q. `[unowned self]` 권장하지 않는 이유?**
   성능 이득은 미미하고, 코드 변경으로 보장이 깨지면 크래시. 안전 마진이 거의 없음.
 
+## Objective-C 비교
+
+| Swift | ObjC |
+|---|---|
+| `weak` (옵셔널, zeroing) | `__weak` (iOS 5+, zeroing) |
+| `unowned` (비옵셔널, dealloc 후 접근 시 crash) | (정확한 1:1 대응 없음. 의미상 `__unsafe_unretained`) |
+| `unowned(unsafe)` | `__unsafe_unretained` (zeroing 없음, dangling 가능) |
+
+- `__weak`은 런타임이 weak table을 관리하다 객체 dealloc 시점에 모든 참조를 nil로 갈아낀다 — Swift `weak`과 동일 메커니즘.
+- iOS 4 deployment target에서는 `__weak`이 없어서 `__unsafe_unretained`로 fallback. 지금은 거의 무의미한 호환성 이슈.
+- 더 깊게: [17-objective-c/ownership-qualifiers](../17-objective-c/ownership-qualifiers.md)
+
 ## 참고
 
 - Swift Language Guide: Resolving Strong Reference Cycles Between Class Instances

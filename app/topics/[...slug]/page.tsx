@@ -5,6 +5,7 @@ import { ArrowLeft, Clock3 } from "lucide-react";
 import { MarkdownArticle } from "@/components/MarkdownArticle";
 import { TopicProgressPanel } from "@/components/TopicProgressPanel";
 import { getAllTopics, getQuestionBank, getTopicBySlug } from "@/lib/content";
+import { getAllProgress } from "@/lib/topic-progress";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,10 @@ export default async function TopicPage({ params }: TopicPageProps) {
     .filter((question) => question.relatedTopicSlugs.includes(topic.slug))
     .slice(0, 8);
 
+  const progressBySlug = new Map(
+    getAllProgress().map((p) => [p.slug, p.masteryLevel] as const)
+  );
+
   return (
     <div className="article-layout">
       <article className="article-shell">
@@ -61,7 +66,11 @@ export default async function TopicPage({ params }: TopicPageProps) {
           {topic.summary ? <p className="article-summary">{topic.summary}</p> : null}
         </header>
         <div className="markdown-body">
-          <MarkdownArticle sourcePath={topic.sourcePath} body={topic.body} />
+          <MarkdownArticle
+            sourcePath={topic.sourcePath}
+            body={topic.body}
+            progressBySlug={progressBySlug}
+          />
         </div>
 
         <TopicProgressPanel slug={topic.slug} />

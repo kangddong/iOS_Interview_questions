@@ -93,7 +93,12 @@ default: print("기타")
 }
 ```
 
-`Range`와 `String`이 `~=` 기본 구현을 가지므로 `case 0..<10:`, `case "foo":`가 동작하는 원리.
+`switch case`는 패턴과 값을 `~=` 연산자로 비교한다. 표준 라이브러리에 두 가지 핵심 오버로드가 구현되어 있어:
+
+- `static func ~= (pattern: Range<Bound>, value: Bound) -> Bool` — `case 0..<10:`이 동작하는 이유
+- `static func ~= <T: Equatable>(a: T, b: T) -> Bool` (제네릭, 사실상 `==`) — `case "foo":`, `case 42:`처럼 `Equatable` 값이 패턴이 되는 모든 경우
+
+`String` 자체가 `~=`를 정의하는 게 아니라 `Equatable` 채택으로 제네릭 `~=` 오버로드에 걸리는 것. `ClosedRange`, `PartialRangeFrom` 등도 각자 `~=` 오버로드를 가져 `case 0...10:`, `case 10...:`이 동작한다.
 
 ## Type Pattern
 
