@@ -52,7 +52,7 @@ DispatchQueue.global(qos: .userInitiated).async { ... }
 | `.utility` | 진행 표시 있는 긴 작업 (다운로드) |
 | `.background` | 사용자가 보지 않는 작업 (인덱싱, 백업) |
 
-QoS가 낮은 큐가 높은 큐의 작업을 *기다리게 되면* OS가 동적으로 우선순위를 끌어올린다(QoS inheritance).
+*높은 QoS 작업이 낮은 QoS 작업의 완료를 기다리는* priority inversion 상황에서, OS가 *낮은 QoS 작업*을 일시적으로 승격시켜 우선순위 역전을 완화한다(QoS override). "낮은 큐가 높은 작업을 기다리면 높은 쪽이 올라간다"가 아니라, *기다림의 대상이 된* 낮은 작업이 끌어올려지는 방향이라는 점이 핵심.
 
 ## Barrier — 컨커런트 큐의 단독 실행 구간
 

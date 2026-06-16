@@ -1,12 +1,12 @@
 # Swift Concurrency Runtime (Cooperative Pool / Executor / Hop)
 
-> 한 줄 요약 — Swift Concurrency는 *코어 수만큼*의 worker thread를 가진 **cooperative thread pool**을 쓴다. await 지점은 *threadhop* 후보고, actor는 자기 executor로의 *hop*을 강제한다. GCD처럼 thread를 *늘려* 해결하지 않고, *덜 만들고 양보(yield)*하는 모델이 핵심.
+> 한 줄 요약 — Swift Concurrency는 *대략 코어 수에 맞춰 overcommit을 제한하는* **cooperative thread pool**을 쓴다("코어 수만큼 정확히 고정"은 단순화된 표현). await 지점은 *thread hop* 후보고, actor는 자기 executor로의 *hop*을 강제한다. GCD처럼 thread를 *늘려* 해결하지 않고, *덜 만들고 양보(yield)*하는 모델이 핵심.
 
 ## 핵심 모델
 
 ```
 +-----------+ +-----------+ +-----------+    <- Cooperative pool
-| Worker 1  | | Worker 2  | | Worker N  |       (코어 수만큼 고정)
+| Worker 1  | | Worker 2  | | Worker N  |       (대략 코어 수에 맞춰 overcommit 제한)
 +-----------+ +-----------+ +-----------+
        ▲             ▲             ▲
        └───────── Tasks (job) ─────┘
@@ -14,10 +14,10 @@
                 Executor (MainActor / actor / global)
 ```
 
-- N개 worker thread (코어 수와 동일)
+- *대략 코어 수* 정도의 worker thread (정확히 N개로 고정된다는 보장이 아니라, *overcommit을 줄이는* 설계)
 - *thread를 양보*하면서 여러 Task를 *non-preemptive*로 실행
 - `await`에서 yield → worker가 다른 task 잡음
-- thread 폭증 없음 (GCD의 *thread explosion* 문제 해결)
+- GCD의 *thread explosion* 문제를 구조적으로 완화 (단, blocking 호출/Obj-C interop 등에서는 여전히 thread가 늘 수 있음)
 
 ## Executor와 Isolation
 
@@ -121,7 +121,7 @@ actor LegacyBackedActor {
 ## GCD와의 공존
 
 - GCD `DispatchQueue.main.async`로 main hop = Swift `await MainActor.run { }`과 *동등 의미*
-- 단, GCD는 thread 폭증 가능, Swift Concurrency는 worker 고정
+- 단, GCD는 thread 폭증이 쉬운 반면 Swift Concurrency는 worker 수를 대략 코어 수에 맞춰 *제한*함
 - 마이그레이션은 점진적: `withCheckedContinuation`으로 콜백 → async 변환
 
 ```swift
@@ -137,7 +137,7 @@ func legacyFetch() async throws -> Data {
 ## 흔한 함정 / Follow-up
 
 - **Q. cooperative pool 크기를 조절할 수 있나?**
-  거의 불가. OS가 코어 수 기반으로 결정. *thread 더 만들기*는 모델의 의도와 반대.
+  사용자 튜닝 지점은 거의 없다. 런타임이 *대략 코어 수*에 맞춰 overcommit을 줄이는 방향으로 관리한다(정확한 고정값은 아니다). *thread 더 만들기*는 모델의 의도와 반대.
 
 - **Q. actor 안에서 blocking 호출은?**
   *최악의 패턴*. 그 executor를 점유해 다른 actor 메서드가 멈춤. C 라이브러리 sync 호출이라면 detached task에서 분리.

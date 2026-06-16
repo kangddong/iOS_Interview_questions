@@ -56,7 +56,7 @@ iOS는 셀룰러 ↔ Wi-Fi 자주 전환. TCP는 매번 재연결, QUIC는 *Conn
 
 ```swift
 let config = URLSessionConfiguration.default
-config.assumesHTTP3Capable = false   // iOS 16+ — 명시적으로 HTTP/3 시도 가능
+config.assumesHTTP3Capable = true    // iOS 16+ — 서버의 HTTP/3 지원을 가정하고 첫 요청부터 QUIC racing 활성화
 let session = URLSession(configuration: config)
 ```
 

@@ -1,6 +1,6 @@
 # 값 타입의 메모리 (스택 vs 힙, Boxing 조건)
 
-> 한 줄 요약 — Swift struct/enum의 인스턴스는 *기본적으로 스택/레지스터*에 산다. 그러나 **escape**(closure 캡처, 컬렉션 보관, existential 박싱), **크기 초과**(existential inline buffer 24B, generic 특수화 실패) 시 *힙으로 박싱*된다. 박싱 여부를 알면 핫패스의 할당 비용을 통제할 수 있다.
+> 한 줄 요약 — Swift struct/enum의 위치는 "값 타입이냐"나 "사이즈가 크냐"만으로 결정되지 않는다. *저장 컨텍스트*가 핵심이다 — 함수 지역 변수는 보통 스택/레지스터이지만, **escape**(closure 캡처, 컬렉션 보관, existential 박싱), **클래스 프로퍼티로 보유**, **CoW backing storage**(Array/String/Set/Dictionary 내부), **indirect enum case**, **inline buffer 초과** 등의 조건이 걸리면 힙으로 옮겨진다. 박싱이 일어나는 지점을 알면 핫패스의 할당 비용을 통제할 수 있다.
 
 ## 기본 규칙
 

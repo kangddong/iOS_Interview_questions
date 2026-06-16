@@ -22,7 +22,7 @@ O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(n³) < O(2ⁿ) < O(n!)
 | **Insertion Sort** | O(n²) | O(n²) | O(1) | O | 작은 데이터에서 빠름 |
 | **Counting Sort** | O(n+k) | O(n+k) | O(k) | O | 정수 범위가 작을 때 |
 
-Swift의 `sort()` = Introsort (Quick + Heap + Insertion 하이브리드). 작은 부분은 insertion으로, 깊이 깊어지면 heap으로 폴백 → worst O(n log n) 보장.
+Swift의 `sort()`는 **stable** 정렬을 보장하며 평균/최악 모두 **O(n log n)**으로 동작한다(SE-0372). 내부 알고리즘은 구현 디테일이라 명시되어 있지 않으므로 "Introsort/Timsort" 같은 단정에는 의존하지 말 것. 안정성과 점근 복잡도만 계약된 면(API contract)으로 외울 것.
 
 ## 탐색
 

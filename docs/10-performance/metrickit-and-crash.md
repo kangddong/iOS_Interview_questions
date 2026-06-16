@@ -2,7 +2,7 @@
 
 > 한 줄 요약 — *실제 사용자 디바이스*에서 일어난 hang/launch/energy/crash를 수집하는 **MetricKit**, 크래시 로그를 사람이 읽을 수 있게 만드는 **Symbolication(dSYM)**, 앱 사이즈를 줄이는 기본 노하우.
 
-도입 버전: MetricKit iOS 13+, on-device hang detection iOS 16+.
+도입 버전: MetricKit metrics iOS 13+, crash/hang/disk write diagnostics(`MXDiagnosticPayload`, `MXHangDiagnostic` 포함) iOS 14+.
 
 ## MetricKit
 
@@ -69,11 +69,14 @@ atos -arch arm64 -o MyApp.app.dSYM/Contents/Resources/DWARF/MyApp -l 0x100000000
 
 | 종류 | 신호 |
 |---|---|
-| `EXC_BAD_ACCESS` | dangling/nil 참조, ARC 정정 실패 |
-| `SIGABRT` | 명시적 abort (예: `fatalError`, `assert`) |
-| `0xbaaaaaad` | watchdog (메인 스레드 응답 없음 → 강제 종료) |
-| `0x8badf00d` | 시작 시간 초과 |
+| `EXC_BAD_ACCESS` | 잘못된 메모리 접근 — dangling 포인터, unmapped 주소, 잘못된 정렬. *Swift의 nil force unwrap은 여기 아님*(아래 참조). |
+| `SIGABRT` | 명시적 abort (`abort()`, Foundation 단언 위반 등) |
+| Swift trap (`EXC_BREAKPOINT` / `SIGILL`) | `fatalError`, `precondition`, force unwrap `nil`, 배열 OOB, 정수 오버플로 등 *Swift 런타임 trap* |
+| `0x8badf00d` ("ate bad food") | **watchdog 타임아웃** — 시작/포그라운드 전환/종료 등에서 메인 스레드가 제한 시간 내 응답 못 함 |
 | `0xdeadfa11` | 사용자가 Force Quit |
+| `0xbaaaaaad` | watchdog crash가 아닌 *시스템 stackshot* 마커 (전체 시스템 스냅샷용). 크래시 종류로 분류하지 말 것 |
+| `0xbad22222` | VoIP 앱이 너무 자주 재개되어 시스템이 종료 |
+| `0xc00010ff` ("cool off") | 디바이스 과열로 인한 종료 |
 
 코드 5xxx의 신호 코드도 의미 있음 (M1 환경 등).
 
@@ -104,8 +107,8 @@ iOS 14까지 Apple이 *서버에서 재컴파일* 가능하도록 Intermediate R
 - **Q. 크래시가 일부 사용자에게만 일어남.**
   iOS 버전, 디바이스, 언어, 메모리 압박 등 환경 변수. MetricKit이 디바이스 메타도 함께 줌. *언제 어디서*가 패턴화되면 원인 단서.
 
-- **Q. Watchdog 크래시 (`0xbaaaaaad`)?**
-  앱이 시작/포그라운드 진입 시 *제한 시간 내 응답 못 함*. 보통 메인 스레드 막힘. 시작 작업 lazy화.
+- **Q. Watchdog 크래시 (`0x8badf00d`)?**
+  앱이 시작/포그라운드/백그라운드 전환 시 *제한 시간 내 응답 못 함*. 보통 메인 스레드 막힘. 시작 작업 lazy화. (`0xbaaaaaad`는 watchdog이 아니라 시스템 stackshot 마커이므로 혼동 주의.)
 
 - **Q. dSYM 잃어버렸다.**
   App Store Connect에서 *기존 빌드 dSYM 다운로드* 가능. 못 찾으면 그 빌드의 크래시는 영원히 unsymbolicated.

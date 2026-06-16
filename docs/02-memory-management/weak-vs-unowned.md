@@ -6,8 +6,8 @@
 
 | 구분 | weak | unowned |
 |---|---|---|
-| 옵셔널 | 항상 `Optional` | 비옵셔널 (또는 `unowned(safe/unsafe)`) |
-| 대상 해제 후 | 자동 `nil` | 접근 시 크래시 |
+| 옵셔널 | 항상 `Optional` (zeroing — 자동 nil) | *보통* 비옵셔널이지만 `unowned Optional`(예: `unowned var owner: Customer?`)도 가능 |
+| 대상 해제 후 | 자동 `nil` | 접근 시 **trap** (`unowned(safe)`는 안전 trap, `unowned(unsafe)`는 UB) |
 | 대상 타입 | class, class-bound protocol | 동일 |
 | 런타임 비용 | 약간 더 큼 (side table 관리) | 더 가벼움 |
 | ObjC 호환 | O | 일부 제약 |
@@ -69,7 +69,7 @@ class Card {
 | Swift | ObjC |
 |---|---|
 | `weak` (옵셔널, zeroing) | `__weak` (iOS 5+, zeroing) |
-| `unowned` (비옵셔널, dealloc 후 접근 시 crash) | (정확한 1:1 대응 없음. 의미상 `__unsafe_unretained`) |
+| `unowned` (보통 비옵셔널, optional 형태도 가능. dealloc 후 접근 시 trap) | (정확한 1:1 대응 없음. 의미상 `__unsafe_unretained`) |
 | `unowned(unsafe)` | `__unsafe_unretained` (zeroing 없음, dangling 가능) |
 
 - `__weak`은 런타임이 weak table을 관리하다 객체 dealloc 시점에 모든 참조를 nil로 갈아낀다 — Swift `weak`과 동일 메커니즘.

@@ -56,8 +56,8 @@ final class HomeViewModel {
     @Published var title = ""
 
     func load() async {
-        let data = await api.fetch()       // 백그라운드에서 실행
-        title = data                       // 다시 메인 (자동 hop)
+        let data = await api.fetch()       // 어느 executor에서 실행될지는 callee(api)의 격리에 따라 결정 — 자동으로 백그라운드라는 보장은 없다
+        title = data                       // MainActor로 다시 hop
     }
 }
 ```
@@ -127,7 +127,7 @@ final class UserRepository { ... }
   안 됨. UI가 멈춤. CPU 바운드는 `Task.detached`나 별도 actor로 분리하고 결과만 메인으로 가져와라.
 
 - **Q. ObjC/UIKit delegate 콜백이 메인이 아닐 수 있다는 건?**
-  대부분 메인이지만 보장은 문서로 확인. 의심스러우면 콜백 진입부에서 `MainActor.assumeIsolated { ... }` 또는 `Task { @MainActor in ... }`로 명시.
+  대부분 메인이지만 보장은 문서로 확인. `MainActor.assumeIsolated { ... }`는 *확실히 MainActor 위에 있을 때만* 써야 한다 — 아니면 런타임 trap이 난다. 메인 보장이 불확실하면 `Task { @MainActor in ... }` 또는 `await MainActor.run { ... }`로 명시적 hop을 강제하는 쪽이 안전하다.
 
 - **Q. actor의 메서드를 `Task` 없이 호출할 수 없는 이유?**
   await을 쓰려면 비동기 컨텍스트가 필요한데, sync 컨텍스트엔 그게 없음. 그래서 `Task { await ... }`로 진입.

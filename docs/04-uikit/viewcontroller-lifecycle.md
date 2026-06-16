@@ -9,7 +9,7 @@ init
 loadView                  // 뷰 계층 생성 (수동 시)
 viewDidLoad               // 뷰 메모리 적재 후 1회
 viewWillAppear            // 화면에 등장하기 직전 (매번)
-viewIsAppearing (iOS 17+) // 뷰가 view hierarchy에 추가됨, 첫 layout 직전
+viewIsAppearing           // 뷰가 view hierarchy에 추가됨, 첫 layout 직전 (iOS 17 SDK / Xcode 15에서 공개, iOS 13까지 back-deploy)
 viewWillLayoutSubviews    // 레이아웃 계산 직전
 viewDidLayoutSubviews     // 레이아웃 직후 (frame 확정)
 viewDidAppear             // 등장 완료 (애니메이션 끝)
@@ -26,7 +26,7 @@ deinit (참조 끊기면)
 |---|---|---|
 | `viewDidLoad` | 1회 | 한 번만 하면 되는 초기 설정 (subview 추가, 색상, target-action) |
 | `viewWillAppear` | 매번 | 데이터 갱신, 네비게이션 바 스타일 변경 |
-| `viewIsAppearing` | 매번 (iOS 17+) | 첫 layout 전, 안전한 frame 의존 코드 |
+| `viewIsAppearing` | 매번 (iOS 17 SDK 공개, iOS 13까지 back-deploy) | 첫 layout 전, 안전한 frame 의존 코드 |
 | `viewDidLayoutSubviews` | 자주 | 동적 레이아웃 후처리 (CALayer 그라디언트 frame 등) |
 | `viewDidAppear` | 매번 | 애니메이션 시작, analytics, 첫 응답자 지정 |
 | `viewWillDisappear` | 매번 | 진행 중 작업 일시 중단, edit 모드 종료 |
@@ -47,6 +47,7 @@ override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     gradient.frame = view.bounds
 }
+// 또는 iOS 13+ 배포 환경에서 viewIsAppearing (Xcode 15 SDK 필요, iOS 13까지 back-deploy)
 ```
 
 ## present / push 시 호출 차이
@@ -92,7 +93,7 @@ child.didMove(toParent: self)
   WillAppear는 *전이 직전*(아직 화면에 일부만 보이거나 가려진 상태도 가능), DidAppear는 *애니메이션이 완전히 끝난 뒤*. 첫 응답자 지정, analytics 같이 "사용자가 보고 있는 것이 확정"된 시점이 필요하면 DidAppear.
 
 - **Q. `viewIsAppearing`이 추가된 이유?**
-  iOS 17+. `viewWillAppear`보다 늦고 `viewDidAppear`보다 이른, **trait collection과 view hierarchy가 모두 확정된 첫 시점**. 기존엔 trait 기반 코드가 willAppear에서 잘못 동작하는 케이스가 있어 보강된 것.
+  iOS 17 SDK / Xcode 15에서 공개됐고 **iOS 13까지 back-deploy되는 API**(즉, 배포 타깃은 iOS 13 이상이면 사용 가능. 단 Xcode 15+ SDK로 빌드해야 함). `viewWillAppear`보다 늦고 `viewDidAppear`보다 이른, **trait collection과 view hierarchy가 모두 확정된 첫 시점**. 기존엔 trait 기반 코드가 willAppear에서 잘못 동작하는 케이스가 있어 보강된 것.
 
 - **Q. `deinit`이 호출되지 않는 이유?**
   retain cycle. 보통 closure에서 self 강참조, NotificationCenter observer 미해제, delegate가 strong인 경우.

@@ -127,7 +127,7 @@ func bfs(_ graph: [Int: [Int]], start: Int) -> [Int] {
   `hash(into:)`에 *동등성 비교에 쓰는 모든 프로퍼티*를 넣어야 함. 그래야 `a == b`이면 `a.hashValue == b.hashValue`.
 
 - **Q. 정렬은 어떤 알고리즘?**
-  Swift는 *Introsort* 변형 (Quicksort + Heapsort + Insertion sort 하이브리드). 평균 O(n log n), worst도 O(n log n) 보장.
+  Swift `sort()`는 **stable** 정렬에 평균/최악 O(n log n)을 *계약*한다(SE-0372). 내부 알고리즘은 공개된 명세가 아니므로 "Introsort/Timsort"로 단정하지 말 것 — 구현은 버전에 따라 바뀔 수 있다.
 
 ## 참고
 

@@ -2,11 +2,11 @@
 
 > 한 줄 요약 — **i18n(internationalization)은 "현지화 가능하도록 코드를 짜는 것"이고, l10n(localization)은 "실제 언어/지역 데이터를 채우는 것"**이다. iOS는 문자열 추출·복수형·날짜·통화·RTL을 *서로 다른 시스템*으로 다루기 때문에, 하나라도 빼면 특정 로케일에서 UI가 무너진다.
 
-도입 버전: `Localizable.strings` (iOS 2+), `Localizable.stringsdict` (iOS 7+ pluralization), `NumberFormatter`/`DateFormatter` (iOS 2+), `RelativeDateTimeFormatter` (iOS 13+), `Date.FormatStyle`/`Measurement.FormatStyle` (iOS 15+), **String Catalogs (`.xcstrings`)** (iOS 17+/Xcode 15+)
+도입 버전: `Localizable.strings` (iOS 2+), `Localizable.stringsdict` (iOS 7+ pluralization), `NumberFormatter`/`DateFormatter` (iOS 2+), `RelativeDateTimeFormatter` (iOS 13+), `Date.FormatStyle`/`Measurement.FormatStyle` (iOS 15+), **String Catalogs (`.xcstrings`)** — **Xcode 15+ 빌드 기능**(런타임 iOS 전용 API가 아니다. 빌드 산출물은 기존 `.strings`/`.stringsdict`로 컴파일되어 구버전 iOS에도 배포 가능)
 
 ## 핵심 개념
 
-- **String Catalogs (`.xcstrings`)** — iOS 17+ Xcode 15부터의 *공식 권장 포맷*. JSON 기반, Xcode 빌드 시 *코드에서 사용하는 키*를 자동 추출, 누락된 번역을 GUI에서 추적. `Localizable.strings` + `stringsdict`를 한 파일로 통합.
+- **String Catalogs (`.xcstrings`)** — **Xcode 15+ 빌드 기능**으로 도입된 *공식 권장 포맷*. JSON 기반, Xcode 빌드 시 *코드에서 사용하는 키*를 자동 추출, 누락된 번역을 GUI에서 추적. `Localizable.strings` + `stringsdict`를 한 파일로 통합. 빌드 시 기존 포맷으로 컴파일되므로 *런타임 iOS 17 전용 기능은 아니다* — 구버전 iOS로의 배포에도 그대로 쓸 수 있다.
 - **키 전략**
   - **Key as English text**: `NSLocalizedString("Sign in", comment: "")` — 직관적, 번역가도 컨텍스트 쉽게 파악. 영어가 *원본*인 팀에 적합.
   - **Semantic key**: `NSLocalizedString("auth.signin.cta", ...)` — 같은 영문이 화면마다 다른 의미일 때 분리 가능. 대형 팀에 적합.
@@ -88,7 +88,7 @@ Text("greeting")
 
 | 구분 | `Localizable.strings` + `stringsdict` | String Catalog (`.xcstrings`) |
 |---|---|---|
-| 도입 | iOS 7~ | iOS 17 / Xcode 15+ |
+| 도입 | iOS 7~ | Xcode 15+ 빌드 기능 (런타임 OS 제약 없음) |
 | 키 추출 | 수동 `genstrings` | 빌드 시 자동 |
 | 누락 추적 | 없음 | Xcode UI에서 상태 표시 |
 | pluralization | 별 파일 | 한 파일 |

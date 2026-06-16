@@ -83,7 +83,7 @@ NSLog(@"%@ / %@", self.name1, self.name2);
 ### `assign` vs `weak` (객체)
 
 - `assign`을 객체에 쓰면 `__unsafe_unretained` → dangling pointer 위험.
-- `weak`은 zeroing이 되어 안전 → delegate는 무조건 `weak`.
+- `weak`은 zeroing이 되어 안전 → delegate는 *일반적으로* `weak`. (단, 소유권 관계가 반대인 경우 — 예: data source가 owner를 strong하게 보유해야 하는 드문 케이스 — 에는 예외가 있을 수 있다.)
 
 ## Block 프로퍼티
 
@@ -131,7 +131,7 @@ annotation이 없으면 implicitly unwrapped optional(`String!`)로 노출 — n
   `let` ≈ `readonly`이지만 의미 차이 있음. Swift `let`은 *재할당 금지*, ObjC `readonly`는 *외부에서 setter 호출 불가* (클래스 내부에선 ivar 직접 변경 가능).
 
 - **Q. `IBOutlet`은 strong인가 weak인가?**
-  과거: top-level outlet은 strong, subview outlet은 weak 권장. 현대 iOS는 view 계층이 view controller에 의해 strong하게 보유되므로 weak로 두어도 안전. Apple 템플릿은 weak 기본.
+  Top-level object(예: nib의 최상위 view)는 **strong**이 일반적이다 — 누군가 보유하지 않으면 사라진다. View hierarchy가 보유하는 subview outlet은 *weak*/*strong* 모두 실무에서 쓰이고, "Apple 템플릿이 무조건 weak"라는 것은 사실과 다르다(Xcode의 Connection Inspector 기본값은 SDK/템플릿에 따라 달라져 왔다). 안전한 기본 원칙은 *소유 관계*에 맞춰 정하는 것 — 다른 객체가 보유한다는 보장이 있으면 weak, 아니면 strong.
 
 ## 참고
 

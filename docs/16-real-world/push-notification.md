@@ -2,7 +2,9 @@
 
 > 한 줄 요약 — **APNs는 Apple이 운영하는 단방향 HTTP/2 게이트웨이**다. 서버가 사용자 기기를 *직접* 깨우는 거의 유일한 합법적 통로이기 때문에, 토큰 관리·payload 설계·실패 회복까지 모두 *Apple이 정한 규칙* 안에서만 가능하다.
 
-도입 버전: APNs HTTP/2 (iOS 10+), Notification Service Extension (iOS 10+), Notification Content Extension (iOS 10+), Communication Notifications (iOS 15+), Time-Sensitive / Focus (iOS 15+), Live Activities + push update (iOS 16.1+)
+도입 버전:
+- **서버↔APNs 통신**: APNs provider API는 *HTTP/2 기반*이며 2021년부터 HTTP/2 provider API 사용이 필수화됐다(서버 측 사실, iOS 버전과 무관).
+- **앱 측 (iOS 버전)**: UserNotifications 프레임워크 / Notification Service Extension / Notification Content Extension (iOS 10+), Communication Notifications (iOS 15+), Time-Sensitive / Focus (iOS 15+), Live Activities + push update (iOS 16.1+).
 
 ## 핵심 개념
 

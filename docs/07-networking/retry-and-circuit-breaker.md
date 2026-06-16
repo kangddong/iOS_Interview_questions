@@ -73,7 +73,10 @@ func shouldRetry(_ request: URLRequest, response: HTTPURLResponse?, error: Error
     }
     guard let resp = response else { return false }
     switch resp.statusCode {
-    case 408, 429: return true                                // 무조건 가능
+    case 408, 429:
+        // 일반적으로 재시도 후보지만, idempotent하지 않거나 body replay가 불가하면 신중해야 함
+        // 429는 Retry-After를 *반드시* 함께 고려
+        return isIdempotent(request)
     case 500...599 where resp.statusCode != 501: return isIdempotent(request)
     default: return false
     }
@@ -152,7 +155,7 @@ func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
 | 목적 | *일시적* 장애 극복 | *지속적* 장애 격리 |
 | 동작 단위 | 단일 요청 | 호스트/엔드포인트 단위 |
 | 비용 | 지연 증가, 서버 부하 ↑ | 사용자 fail-fast (의도된 실패) |
-| 함께 쓰는가 | **반드시 결합** — retry가 무한히 시도하지 않도록 breaker가 상한 역할 |
+| 함께 쓰는가 | 자주 결합해 쓰지만 *필수*는 아님 — 트래픽 규모/SLA에 따라 retry+timeout만으로 충분한 경우도 있고, 다수 endpoint를 가진 클라이언트일 때 breaker가 큰 가치를 더한다 |
 
 | 메서드 | 멱등 | 재시도 안전 | 비고 |
 |---|---|---|---|

@@ -22,7 +22,9 @@ actor Box {
 - `Int`, `String`, `Array<T: Sendable>`, `Optional<T: Sendable>` 등.
 - `actor` 자체.
 - `@Sendable`로 표시된 closure.
-- `let`만 가진 final class 중 모든 프로퍼티가 Sendable.
+- `actor` 자체 / `@Sendable` closure는 위 두 줄이 커버.
+
+> 클래스는 *암시적 Sendable 대상이 아니다*. `let`만 가진 final class라도 `final class Foo: Sendable { ... }`처럼 *명시적으로 conform*해야 컴파일러가 Sendable로 인정한다. 암시적 Sendable 합성이 적용되는 건 주로 *조건을 만족하는 struct/enum*과 *actor*다.
 
 ## 자동으로 Sendable이 *아닌* 것
 

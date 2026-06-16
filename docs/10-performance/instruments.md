@@ -40,9 +40,9 @@
 
 Xcode 디버깅 중 ⊠(가운데 박스 같은 아이콘) 버튼. 살아있는 객체 그래프 시각화. retain cycle을 그래프 모양(ring)으로 발견.
 
-## Hang Detection (iOS 16+)
+## Hang Detection
 
-`MetricKit` + Instruments Hangs로 *유저가 본* hang을 잡음. 100ms 이상 메인이 막히면 hang.
+`MetricKit`(`MXHangDiagnostic`, iOS 14+) + Instruments Hangs로 *유저가 본* hang을 잡음. 임계값은 단순히 "100ms"로 단정할 수 없고 — *체감 hitch/응답성 기준*으로 100ms를 흔히 쓰지만, MetricKit이 분류하는 hang severity(micro / short / long)는 별도 정의가 있어 100ms 한 줄로 환원되지 않는다.
 
 ## Os Signpost — 직접 마킹
 

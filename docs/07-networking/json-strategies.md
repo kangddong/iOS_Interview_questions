@@ -135,7 +135,7 @@ let data = try e.encode(model)
 | Key 전략 | 비용 | 주의 |
 |---|---|---|
 | `.useDefaultKeys` | 0 | CodingKeys 수동 관리 |
-| `.convertFromSnakeCase` | 컨테이너당 키 변환 1회 | CodingKeys 매핑과 *공존 금지* |
+| `.convertFromSnakeCase` | 컨테이너당 키 변환 1회 | CodingKeys raw value 매핑과 *충돌하기 쉬움* — 혼용 지양, 필요하면 한쪽으로 통일 |
 | `.custom` | 호출당 클로저 | hot path는 직접 CodingKeys가 빠름 |
 
 ## 흔한 함정 / Follow-up

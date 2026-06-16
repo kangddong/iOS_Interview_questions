@@ -77,7 +77,7 @@ func login_succeeds() async throws {
 
 ## setUp/tearDown
 
-XCTest의 `setUp/tearDown` 대신 *struct로 묶고 init/deinit*을 활용:
+XCTest의 `setUp/tearDown` 대신 *suite 타입으로 묶고 init*에서 설정:
 
 ```swift
 struct CalculatorTests {
@@ -89,8 +89,11 @@ struct CalculatorTests {
 }
 ```
 
-- 각 테스트마다 *struct 새 인스턴스* 만들어 격리.
-- `deinit`이 tearDown 역할 (struct deinit이 곧 메모리 정리).
+- 각 테스트마다 *suite 타입의 새 인스턴스*가 만들어져 격리된다.
+- struct에는 `deinit`이 없다. tearDown이 필요하면 다음 중 골라 쓴다:
+  - `defer { ... }` — 테스트 본문 끝에 정리 코드.
+  - **helper class fixture** — suite를 `final class`로 만들면 `deinit`을 tearDown처럼 쓸 수 있다. 또는 별도 RAII helper class를 프로퍼티로 보유.
+  - **trait/custom Trait** — 여러 테스트가 공통 정리를 공유할 때.
 
 ## 비동기 / async
 

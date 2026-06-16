@@ -1,6 +1,6 @@
 # Heap vs Stack (값 타입의 메모리)
 
-> 한 줄 요약 — **stack은 함수 프레임에 묶인 빠른 공간, heap은 동적 할당이 필요한 영역**. struct/enum은 *기본적으로* stack에 들어가지만, *closure 캡처 / 박싱 / 큰 값 / 클래스 프로퍼티* 등의 조건에서 heap으로 옮겨진다.
+> 한 줄 요약 — **stack은 함수 프레임에 묶인 빠른 공간, heap은 동적 할당이 필요한 영역**. Swift에서 stack/heap 결정은 *값 타입 여부*나 *사이즈*만으로 정해지지 않고 — 저장 컨텍스트(지역 변수인지, escape 되는지, 클래스 프로퍼티/CoW backing storage/existential에 들어가는지)에 따라 갈린다. struct/enum이 *지역 변수*일 때 주로 stack이고, *closure 캡처 / 박싱 / 클래스 프로퍼티 / indirect enum* 등에서는 heap이다.
 
 ## 기본 분류
 

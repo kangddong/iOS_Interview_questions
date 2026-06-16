@@ -1,6 +1,6 @@
 # Swift 6 Strict Concurrency
 
-> 한 줄 요약 — Swift 6는 **데이터 레이스를 컴파일 에러로 강제**한다. 5.x에서 경고였던 `Sendable`/actor 격리 위반이 *빌드 실패*로 격상. 마이그레이션은 *Targeted → Complete* 단계로.
+> 한 줄 요약 — Swift 6 strict concurrency는 5.x에서 경고였던 `Sendable`/actor 격리 위반의 *상당 부분을 컴파일 에러로 격상*한다. 단, "모든 데이터 레이스를 컴파일 타임에 잡는다"는 아니다 — `@unchecked Sendable`, unsafe pointer, lock 기반 공유 상태, ObjC/C interop처럼 *컴파일러가 증명할 수 없는 영역*은 여전히 개발자 책임으로 남는다. 마이그레이션은 *Targeted → Complete* 단계로.
 
 도입 버전: Swift 5.10에서 점진적 옵트인, Swift 6.0부터 기본.
 
@@ -8,7 +8,7 @@
 
 | | Swift 5 | Swift 6 |
 |---|---|---|
-| 데이터 레이스 | 런타임 버그 | **컴파일 에러** |
+| 데이터 레이스 | 런타임 버그 | **컴파일러가 증명 가능한 영역은 빌드 에러로 격상** (unchecked/unsafe/Obj-C interop 영역은 여전히 개발자 책임) |
 | Sendable 검사 | 옵션 | 기본 |
 | actor 격리 위반 | 경고 | 에러 |
 | `@unchecked Sendable` | 사용 가능 | 그대로 (개발자 책임) |

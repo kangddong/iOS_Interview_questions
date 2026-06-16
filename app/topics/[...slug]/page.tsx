@@ -46,12 +46,16 @@ export default async function TopicPage({ params }: TopicPageProps) {
     getAllProgress().map((p) => [p.slug, p.masteryLevel] as const)
   );
 
+  const parentSegments = slug.slice(0, -1);
+  const parentHref = parentSegments.length === 0 ? "/topics" : `/topics/${parentSegments.join("/")}`;
+  const parentLabel = parentSegments.length === 0 ? "지식 베이스" : topic.categoryTitle;
+
   return (
     <div className="article-layout">
       <article className="article-shell">
-        <Link href="/topics" className="back-link">
+        <Link href={parentHref} className="back-link">
           <ArrowLeft size={17} aria-hidden="true" />
-          지식 베이스
+          {parentLabel}
         </Link>
         <header className="article-header">
           <p className="eyebrow">{topic.categoryTitle}</p>
