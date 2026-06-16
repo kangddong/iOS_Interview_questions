@@ -707,6 +707,90 @@ button {
 .markdown-body .topic-li-content {
   flex: 1 1 auto;
 }
+
+.term-trigger {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.term-trigger:hover,
+.term-trigger:focus-visible {
+  color: #1e40af;
+  text-decoration-style: solid;
+  outline: none;
+}
+.term-trigger-missing {
+  color: #b91c1c;
+  text-decoration-style: wavy;
+  cursor: help;
+}
+
+.term-popover {
+  z-index: 50;
+  max-width: 360px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  font-size: 13px;
+  line-height: 1.55;
+  color: #0f172a;
+  animation: term-popover-in 120ms ease-out;
+}
+@keyframes term-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.term-popover-arrow {
+  fill: #ffffff;
+  stroke: #e5e7eb;
+}
+.term-popover-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+}
+.term-popover-summary {
+  margin: 0;
+  color: #334155;
+}
+.term-popover-refs {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.term-popover-refs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1d4ed8;
+  text-decoration: none;
+  font-size: 12px;
+}
+.term-popover-refs a:hover {
+  text-decoration: underline;
+}
 .sr-only {
   position: absolute;
   width: 1px;

@@ -1,13 +1,24 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Check, X } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { resolveDocHref } from "@/lib/content";
+import { TermPopover } from "@/components/TermPopover";
 
 interface MarkdownArticleProps {
   sourcePath: string;
   body: string;
   progressBySlug?: Map<string, number>;
+}
+
+const TERM_PATTERN = /\{\{term:([a-z0-9-]+)\|([^}]+)\}\}/gi;
+
+function preprocessTerms(body: string): string {
+  return body.replace(TERM_PATTERN, (_match, key, label) => {
+    return `<termref data-key="${key}">${label}</termref>`;
+  });
 }
 
 type HastNode = {
@@ -33,7 +44,13 @@ export function MarkdownArticle({ sourcePath, body, progressBySlug }: MarkdownAr
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
       components={{
+        termref: ({ children, ...rest }: { children?: ReactNode; "data-key"?: string }) => {
+          const key = rest["data-key"] ?? "";
+          const label = typeof children === "string" ? children : String(children);
+          return <TermPopover termKey={key} label={label} />;
+        },
         a: ({ href = "", children }) => {
           const resolvedHref = resolveDocHref(sourcePath, href);
           const isInternal = resolvedHref.startsWith("/");
@@ -70,9 +87,9 @@ export function MarkdownArticle({ sourcePath, body, progressBySlug }: MarkdownAr
             </li>
           );
         }
-      }}
+      } as Components}
     >
-      {body}
+      {preprocessTerms(body)}
     </ReactMarkdown>
   );
 }
