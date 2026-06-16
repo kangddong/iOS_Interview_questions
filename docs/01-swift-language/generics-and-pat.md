@@ -18,7 +18,7 @@ struct Stack<Element> {
 }
 ```
 
-- 컴파일러가 *타입 특수화(specialization)*로 각 사용처 코드를 별도 생성 → 동적 디스패치 비용 없음
+- 컴파일러가 {{term:specialization|타입 특수화(specialization)}}로 각 사용처 코드를 별도 생성 → 동적 디스패치 비용 없음
 - `where` 절로 추가 제약 (`where Element: Equatable`)
 
 ## PAT (Protocol with Associated Type)
