@@ -1,8 +1,27 @@
 import type { ExamQuestion } from "@/lib/types";
+import { questions as quiz01Swift1 } from "@/data/quiz/01-swift-language-part1";
+import { questions as quiz01Swift2 } from "@/data/quiz/01-swift-language-part2";
+import { questions as quiz01Swift3 } from "@/data/quiz/01-swift-language-part3";
+import { questions as quiz02Memory } from "@/data/quiz/02-memory-management";
+import { questions as quiz03Concurrency } from "@/data/quiz/03-concurrency";
+import { questions as quiz04UIKit } from "@/data/quiz/04-uikit";
+import { questions as quiz05SwiftUI } from "@/data/quiz/05-swiftui";
+import { questions as quiz06Architecture } from "@/data/quiz/06-architecture";
+import { questions as quiz07Networking } from "@/data/quiz/07-networking";
+import { questions as quiz08Persistence } from "@/data/quiz/08-persistence";
+import { questions as quiz09Testing } from "@/data/quiz/09-testing";
+import { questions as quiz10Performance } from "@/data/quiz/10-performance";
+import { questions as quiz11Build } from "@/data/quiz/11-build-system";
+import { questions as quiz12Patterns } from "@/data/quiz/12-design-patterns";
+import { questions as quiz13CS } from "@/data/quiz/13-cs-fundamentals";
+import { questions as quiz14Network } from "@/data/quiz/14-network";
+import { questions as quiz15Paradigms } from "@/data/quiz/15-paradigms";
+import { questions as quiz16RealWorld } from "@/data/quiz/16-real-world";
+import { questions as quiz17ObjC } from "@/data/quiz/17-objective-c";
 
 type RawExamQuestion = Omit<ExamQuestion, "partId">;
 
-export const objectiveExamQuestions: RawExamQuestion[] = [
+const baseObjectiveExamQuestions: RawExamQuestion[] = [
   {
     id: "objective-basic-optional-001",
     type: "objective",
@@ -2096,4 +2115,27 @@ export const objectiveExamQuestions: RawExamQuestion[] = [
     explanation: "Identifier는 i18n에 깨지지 않는 selector용. Label은 i18n 대상. XCUITest는 Identifier로 요소를 찾는 게 안정적.",
     relatedTopicSlugs: ["16-real-world/accessibility", "09-testing/snapshot-and-ui-testing"]
   }
+];
+
+export const objectiveExamQuestions: RawExamQuestion[] = [
+  ...baseObjectiveExamQuestions,
+  ...quiz01Swift1,
+  ...quiz01Swift2,
+  ...quiz01Swift3,
+  ...quiz02Memory,
+  ...quiz03Concurrency,
+  ...quiz04UIKit,
+  ...quiz05SwiftUI,
+  ...quiz06Architecture,
+  ...quiz07Networking,
+  ...quiz08Persistence,
+  ...quiz09Testing,
+  ...quiz10Performance,
+  ...quiz11Build,
+  ...quiz12Patterns,
+  ...quiz13CS,
+  ...quiz14Network,
+  ...quiz15Paradigms,
+  ...quiz16RealWorld,
+  ...quiz17ObjC,
 ];
