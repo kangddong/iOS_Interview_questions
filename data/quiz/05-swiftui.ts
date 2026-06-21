@@ -14,7 +14,7 @@ export const questions: RawExamQuestion[] = [
     prompt:
       "SwiftUI의 `Layout` 프로토콜(iOS 16+)에서 반드시 구현해야 하는 두 메서드는 무엇인가?",
     choices: [
-      { id: "a", text: "sizeThatFits(_:subviews:cache:)와 placeSubviews(in:proposal:subviews:cache:)" },
+      { id: "a", text: "sizeThatFits(proposal:subviews:cache:)와 placeSubviews(in:proposal:subviews:cache:)" },
       { id: "b", text: "layoutSize(for:)와 layoutChildren(_:)" },
       { id: "c", text: "preferredSize(for:)와 arrange(in:)" },
       { id: "d", text: "measureContent(_:)와 commitLayout(_:)" },
@@ -388,7 +388,7 @@ export const questions: RawExamQuestion[] = [
     level: "advanced",
     category: "SwiftUI",
     prompt:
-      "자주 변경되는 작은 `@State`를 부모 View에 두는 것보다 자식 View로 내리는(State Hoisting 역방향) 것이 유리한 이유는?",
+      "자주 변경되는 작은 `@State`를 부모 View가 아닌 자식 View로 옮기는(state colocation, \"push state down\") 것이 유리한 이유는?",
     choices: [
       { id: "a", text: "자식 View는 부모의 @State에 접근할 수 없기 때문이다." },
       { id: "b", text: "자식이 직접 state를 가지면 그 자식의 body만 재호출되어 부모와 형제 View의 불필요한 재계산이 줄어든다." },
@@ -397,7 +397,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "부모 View에 자주 변경되는 state가 있으면 부모 body가 재호출될 때 비용이 큰 형제 View(예: ExpensiveList)도 함께 평가된다. 해당 state를 자식으로 내리면 그 자식 body만 재호출되어 전체 트리의 불필요한 재계산이 줄어든다.",
+      "부모 View에 자주 변경되는 state가 있으면 부모 body가 재호출될 때 비용이 큰 형제 View(예: ExpensiveList)도 함께 평가된다. 해당 state를 자식으로 내리는 *state colocation* (\"push state down\") 패턴을 쓰면 그 자식 body만 재호출되어 전체 트리의 불필요한 재계산이 줄어든다.",
     relatedTopicSlugs: ["05-swiftui/performance"],
   },
 
@@ -555,5 +555,41 @@ export const questions: RawExamQuestion[] = [
     explanation:
       "`id: \\.self`는 요소의 값 자체를 id로 사용한다. 두 요소가 같은 값이면 id 충돌이 발생하고, 요소 값이 바뀌면 SwiftUI가 새 row로 인식하여 잘못된 애니메이션, TextField 리셋 등의 버그가 발생할 수 있다. `Identifiable`을 채택하여 안정적인 id를 사용하는 것이 권장된다.",
     relatedTopicSlugs: ["05-swiftui/view-identity-and-lifetime"],
+  },
+
+  // ─── state-bindings (add: 2) ─────────────────────────────────────────────
+  {
+    id: "objective-c05-basic-binding-001",
+    type: "objective",
+    level: "basic",
+    category: "SwiftUI",
+    prompt: "`@Binding`의 의미와 `@State`와의 관계로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "`@Binding`은 부모의 값 타입 state에 대한 양방향 참조이며, `$state` projected value로 자식에 전달한다" },
+      { id: "b", text: "`@Binding`은 자식이 자체적으로 새 state를 소유하게 만든다" },
+      { id: "c", text: "`@Binding`은 ObservableObject만 받을 수 있다" },
+      { id: "d", text: "`@Binding`은 read-only이며 자식이 값을 변경할 수 없다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "`@Binding`은 다른 View가 소유한 state(보통 부모의 `@State`)에 대한 *읽기·쓰기 양방향 참조*다. 부모는 `$state`로 projected value를 만들어 자식 init의 `Binding<T>` 매개변수에 전달한다. 자식이 binding을 통해 값을 바꾸면 부모의 원본 state가 갱신되고, 양쪽 모두 re-render된다. 자식이 자체적으로 state를 소유하길 원하면 `@State`를 직접 두면 된다(state colocation).",
+    relatedTopicSlugs: ["05-swiftui/state-management"],
+  },
+  {
+    id: "objective-c05-intermediate-environment-001",
+    type: "objective",
+    level: "intermediate",
+    category: "SwiftUI",
+    prompt: "`@Environment`와 `@EnvironmentObject`의 차이로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "둘은 같은 매크로의 별칭일 뿐 동작은 동일하다" },
+      { id: "b", text: "`@Environment(\\.colorScheme)`처럼 시스템·값 타입 환경 값을 읽을 때는 `@Environment`, ObservableObject(또는 @Observable 인스턴스)를 환경으로 주입·구독할 때는 `@EnvironmentObject`를 쓴다" },
+      { id: "c", text: "`@Environment`는 자식이 값을 변경할 수 있고, `@EnvironmentObject`는 read-only다" },
+      { id: "d", text: "`@EnvironmentObject`는 iOS 17에서 deprecate되어 사용하면 안 된다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "`@Environment(\\.key)`는 SwiftUI의 *EnvironmentValues*(colorScheme, locale, dismiss 등) 또는 직접 정의한 EnvironmentKey의 값 타입을 읽는 용도다. `@EnvironmentObject`는 상위에서 `.environmentObject(_:)`로 주입한 ObservableObject를 자식이 받아 구독하는 용도로, 주입이 누락되면 런타임에 fatalError가 발생한다. iOS 17 Observation 매크로(`@Observable`)에선 `@Environment(MyStore.self)` 형태로도 객체 환경 주입이 가능하지만 `@EnvironmentObject` 자체가 deprecate된 것은 아니다.",
+    relatedTopicSlugs: ["05-swiftui/state-management"],
   },
 ];

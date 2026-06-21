@@ -50,17 +50,17 @@ export const questions: RawExamQuestion[] = [
     prompt:
       "swift-snapshot-testing에서 첫 번째 테스트 실행 시 어떤 일이 일어나는가?",
     choices: [
-      { id: "a", text: "테스트가 즉시 실패하고 기준 이미지 생성을 요청한다" },
+      { id: "a", text: "Xcode가 자동으로 기준 이미지를 네트워크에서 다운로드한다" },
       {
         id: "b",
-        text: "현재 결과 이미지를 디스크(__Snapshots__/)에 저장하고 통과한다",
+        text: "현재 결과 이미지를 디스크(__Snapshots__/)에 저장하고 \"No reference was found... Automatically recorded snapshot\" 메시지와 함께 테스트를 실패로 표시한다",
       },
       { id: "c", text: "이미지를 메모리에만 유지하고 다음 실행 시 비교한다" },
-      { id: "d", text: "Xcode가 자동으로 기준 이미지를 네트워크에서 다운로드한다" },
+      { id: "d", text: "테스트가 통과하지만 CI에서는 자동으로 실패한다" },
     ],
     correctChoiceId: "b",
     explanation:
-      "swift-snapshot-testing은 기준 이미지가 없을 때 첫 실행에서 현재 렌더링 결과를 __Snapshots__/ 디렉토리에 저장하고 테스트를 통과시킵니다. 이후 실행부터는 저장된 이미지와 바이트 비교를 수행하며, 이 기준 파일을 git에 commit해야 CI에서도 비교가 가능합니다.",
+      "swift-snapshot-testing은 기준 이미지가 없을 때 첫 실행에서 현재 렌더링 결과를 __Snapshots__/ 디렉토리에 저장하면서 동시에 *테스트를 실패*로 표시합니다. 이는 의도적 동작으로, 개발자가 기록된 스냅샷을 시각적으로 확인한 뒤 git에 commit하도록 유도합니다. 이후 실행부터는 저장된 이미지와 바이트 비교를 수행합니다. `isRecording = true`로 명시적 재기록 모드도 지원합니다.",
     relatedTopicSlugs: ["09-testing/snapshot-and-ui-testing"],
   },
   {
@@ -179,7 +179,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "Swift Testing에서는 struct로 테스트를 묶고 init()에서 SUT를 초기화합니다. 각 @Test 함수 실행 시 struct의 새 인스턴스가 생성되므로 자연스럽게 테스트 격리가 보장됩니다. struct deinit이 tearDown 역할을 합니다. XCTestCase 상속은 Swift Testing이 아닌 XCTest 방식입니다.",
+      "Swift Testing에서는 struct로 테스트를 묶고 init()에서 SUT를 초기화합니다. 각 @Test 함수 실행 시 struct의 새 인스턴스가 생성되므로 자연스럽게 테스트 격리가 보장됩니다. **struct에는 deinit이 없으므로** tearDown이 꼭 필요하다면 suite를 `final class`로 바꿔 `deinit`을 활용하거나, RAII helper(예: `defer` 또는 disposable wrapper)를 두면 됩니다. XCTestCase 상속은 Swift Testing이 아닌 XCTest 방식입니다.",
     relatedTopicSlugs: ["09-testing/swift-testing"],
   },
   {
@@ -400,6 +400,25 @@ export const questions: RawExamQuestion[] = [
     correctChoiceId: "b",
     explanation:
       "measure { } 블록은 내부적으로 여러 번 실행해 평균과 표준편차를 측정합니다. CI 서버는 동시에 다른 빌드가 실행되거나 하드웨어 부하가 일정하지 않아 노이즈가 크므로, 베이스라인(기준값)이 환경마다 달라 거짓 실패가 자주 발생합니다. 성능 테스트는 전용 환경(맥 미니, 일정 사양 머신)에서 별도 스킴으로 관리하는 것이 권장됩니다.",
+    relatedTopicSlugs: ["09-testing/xctest"],
+  },
+
+  // ─── xctunwrap (add: 1) ──────────────────────────────────────────────────
+  {
+    id: "objective-c09-intermediate-xctunwrap-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Testing",
+    prompt: "XCTest에서 `XCTUnwrap(_:)`를 `XCTAssertNotNil` + `!` 강제 언래핑 대신 권장하는 이유는?",
+    choices: [
+      { id: "a", text: "nil이면 `XCTUnwrap`은 *현재 테스트만 실패*시키고 다음 테스트로 넘어가는 반면, 강제 언래핑은 테스트 러너 전체를 trap·중단시켜 후속 테스트가 실행되지 않는다" },
+      { id: "b", text: "XCTUnwrap이 강제 언래핑보다 항상 빠르다" },
+      { id: "c", text: "강제 언래핑은 Swift Testing에서만 사용 가능하다" },
+      { id: "d", text: "XCTUnwrap은 nil이어도 항상 통과시킨다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "강제 언래핑(`!`)이 nil에 부딪히면 Swift 런타임이 trap하여 프로세스가 죽고 *그 시점 이후의 모든 테스트*가 실행되지 않는다. `XCTUnwrap`은 nil일 때 `XCTestError`를 throw해 현재 테스트만 실패 처리하고 러너는 계속 다음 테스트로 넘어가므로 CI에서 한 번에 더 많은 정보를 얻을 수 있다. Swift Testing에서는 `#require`가 같은 역할을 한다.",
     relatedTopicSlugs: ["09-testing/xctest"],
   },
 ];

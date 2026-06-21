@@ -649,4 +649,23 @@ export const questions: RawExamQuestion[] = [
       "포그라운드에서는 WebSocket으로 실시간 메시지를 수신하고, 백그라운드에서는 APNs Push로 알림을 받는다. 서버는 메시지 발생 시 두 채널 모두 발송하고, 클라이언트는 메시지 ID로 중복을 제거(dedup)한다. 이것이 iOS 채팅 앱의 표준 패턴이다.",
     relatedTopicSlugs: ["14-network/websocket"],
   },
+
+  // ─── ws-vs-sse (add: 1) ──────────────────────────────────────────────────
+  {
+    id: "objective-c14-intermediate-ws-vs-sse-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Network",
+    prompt: "WebSocket과 Server-Sent Events(SSE)의 핵심 차이로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "WebSocket은 단일 TCP 연결 위 *양방향 풀듀플렉스*, SSE는 HTTP 위 *서버→클라이언트 단방향* 스트림이며 텍스트만 지원한다" },
+      { id: "b", text: "둘 다 양방향이지만 SSE가 더 빠르다" },
+      { id: "c", text: "SSE는 UDP, WebSocket은 TCP 위에서 동작한다" },
+      { id: "d", text: "WebSocket은 HTTP/3에서만 동작하고 SSE는 HTTP/1.1에서만 동작한다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "WebSocket은 101 Switching Protocols 핸드셰이크 후 같은 TCP 연결을 *양방향 풀듀플렉스*로 사용한다(바이너리·텍스트 모두 가능). SSE는 일반 HTTP 응답을 끝없이 유지해 서버가 `text/event-stream`으로 *클라이언트로만* 이벤트를 흘려보내는 단방향 채널이며 텍스트만 지원하지만 자동 재연결·last event id 같은 기능이 표준에 포함되어 단순 푸시엔 가볍다. 채팅처럼 양방향이 필요하면 WebSocket, 알림·티커처럼 단방향이면 SSE가 어울린다.",
+    relatedTopicSlugs: ["14-network/websocket"],
+  },
 ];

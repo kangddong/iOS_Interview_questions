@@ -530,4 +530,23 @@ export const questions: RawExamQuestion[] = [
       "Objective-C에서는 init 중에 부분적으로 초기화된 self를 메서드에 전달할 수 있어 불완전한 상태의 객체가 노출됐다. Swift의 2단계 초기화는 Phase 1이 완료될 때까지 self 사용을 컴파일 타임에 막아 buggy state를 원천 차단한다.",
     relatedTopicSlugs: ["01-swift-language/initialization"],
   },
+
+  // ─── access-control package (add: 1) ─────────────────────────────────────
+  {
+    id: "objective-c01-intermediate-access-control-006",
+    type: "objective",
+    level: "intermediate",
+    category: "Swift Language",
+    prompt: "Swift 5.9에서 도입된 `package` 접근 수준의 사용 동기로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "여러 모듈로 분리된 한 package(예: SPM package) 내부 모듈들끼리는 노출하되, 외부 사용자에겐 감추기 위해" },
+      { id: "b", text: "internal과 동일하지만 ObjC에 노출되는 점만 다르다" },
+      { id: "c", text: "한 모듈 내부에서만 사용 가능하도록 internal보다 엄격하게 제한한다" },
+      { id: "d", text: "Swift Concurrency의 격리 경계로 사용된다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "이전엔 SPM package를 여러 타깃 모듈로 쪼개면 내부 공유용 심볼을 `public`으로 열어야 했고, 그 결과 *외부 사용자*에게도 모두 노출돼 API 표면이 부풀었다. Swift 5.9의 `package` 접근 수준은 *같은 Swift package 내 다른 모듈*에는 보이지만 외부에는 감춰 모듈 분리와 캡슐화를 동시에 가능하게 한다.",
+    relatedTopicSlugs: ["01-swift-language/access-control"],
+  },
 ];

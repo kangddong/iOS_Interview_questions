@@ -339,11 +339,11 @@ export const questions: RawExamQuestion[] = [
       { id: "a", text: "관찰 대상 클래스가 Codable 프로토콜을 채택해야 한다" },
       { id: "b", text: "관찰 대상 클래스가 NSObject를 상속해야 한다" },
       { id: "c", text: "관찰할 프로퍼티에 @objc dynamic을 붙여야 한다" },
-      { id: "d", text: "ObjC 런타임에 의존하므로 순수 Swift struct에는 사용할 수 없다" },
+      { id: "d", text: "관찰자가 NSKeyValueObservation 결과를 보관해 관찰 수명을 유지해야 한다" },
     ],
     correctChoiceId: "a",
     explanation:
-      "KVO는 ObjC 런타임 기반으로, 관찰 대상 클래스가 NSObject를 상속하고 관찰할 프로퍼티에 `@objc dynamic`이 붙어야 합니다. Codable 채택은 JSON 직렬화와 관련된 것으로 KVO와 무관합니다. 순수 Swift struct에는 KVO를 사용할 수 없으며, 이 경우 Combine이나 @Observable이 대안입니다.",
+      "KVO의 *필수 조건*은 (1) NSObject 상속, (2) 관찰 프로퍼티에 `@objc dynamic`, (3) 관찰자 측에서 `NSKeyValueObservation` 토큰을 유지하는 것입니다. Codable 채택은 JSON 직렬화와 관련된 것으로 KVO와 무관합니다. 참고: KVO가 ObjC 런타임에 의존하므로 순수 Swift struct에는 사용할 수 없고, 이 경우 Combine이나 @Observable이 대안입니다 — 이는 *조건*이 아니라 *제약*입니다.",
     relatedTopicSlugs: ["12-design-patterns/observer"],
   },
   {
@@ -655,5 +655,58 @@ export const questions: RawExamQuestion[] = [
     explanation:
       "AsyncStream의 기본 buffering 정책은 `unbounded`입니다. Consumer 처리 속도보다 Producer가 빠를 경우 버퍼에 이벤트가 무한히 쌓여 메모리가 폭증할 수 있습니다. 이를 방지하기 위해 `.bufferingNewest(N)` 또는 `.bufferingOldest(N)`을 명시해 최대 N개만 보관하도록 제한하는 것이 권장됩니다.",
     relatedTopicSlugs: ["12-design-patterns/swift-idiomatic-patterns"],
+  },
+
+  // ─── coordinator (add: 3) ────────────────────────────────────────────────
+  {
+    id: "objective-c12-intermediate-coordinator-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Design Patterns",
+    prompt: "Coordinator 패턴을 도입하는 가장 직접적인 동기는?",
+    choices: [
+      { id: "a", text: "ViewController가 화면 전환·딥링크·플로우 분기 로직까지 떠안아 비대해지는 것을 막고, 그 책임을 별도 객체로 분리하기 위해" },
+      { id: "b", text: "UINavigationController를 제거하기 위해" },
+      { id: "c", text: "Storyboard segue를 자동 생성하기 위해" },
+      { id: "d", text: "SwiftUI NavigationStack과 호환되지 않는 화면을 강제로 재사용하기 위해" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "Coordinator는 ViewController가 \"무엇을 보여줄지\"에만 집중하도록, *다음 어디로 갈지*에 대한 결정과 의존성 조립을 빼내는 패턴이다. UIKit의 push/present 호출이 VC에 흩어지면 화면 간 결합도가 올라가고 딥링크/로그인 흐름 분기 같은 게 누더기처럼 박힌다. Coordinator는 이 결정을 별도 객체에 모아 VC를 가볍게 유지하고 화면 재사용성을 높인다.",
+    relatedTopicSlugs: ["12-design-patterns/coordinator"],
+  },
+  {
+    id: "objective-c12-intermediate-coordinator-002",
+    type: "objective",
+    level: "intermediate",
+    category: "Design Patterns",
+    prompt: "부모 Coordinator가 자식 Coordinator를 `childCoordinators` 배열로 보관하는 이유로 가장 적절한 것은?",
+    choices: [
+      { id: "a", text: "Swift는 strong 참조를 자동으로 막아주므로 추가 보관이 필수다" },
+      { id: "b", text: "자식 Coordinator가 비동기 흐름 도중 deallocate되어 화면이 중간에 사라지는 것을 막고, 흐름이 끝나면 명시적으로 제거해 메모리를 해제하기 위해" },
+      { id: "c", text: "Coordinator는 UIViewController의 서브클래스라서 navigation stack과 동기화가 필요하다" },
+      { id: "d", text: "Combine publisher의 cancellable과 동일한 동작을 자동으로 제공한다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "Coordinator는 보통 UIKit의 strong 참조 체인 밖에 있다(VC가 Coordinator를 모르거나 weak로만 안다). 부모가 `childCoordinators`에 push해 두지 않으면 자식이 ARC로 즉시 해제되어 진행 중이던 흐름이 도중에 끊긴다. 흐름이 끝나면 부모가 명시적으로 자식을 제거(`childCoordinators.removeAll { $0 === child }`)해 메모리도 깔끔히 회수한다.",
+    relatedTopicSlugs: ["12-design-patterns/coordinator"],
+  },
+  {
+    id: "objective-c12-advanced-coordinator-003",
+    type: "objective",
+    level: "advanced",
+    category: "Design Patterns",
+    prompt: "딥링크(예: myapp://order/123)를 받아 다단계 화면 스택을 재현해야 할 때 Coordinator 구조에서 자연스러운 처리 방식은?",
+    choices: [
+      { id: "a", text: "AppCoordinator가 URL을 파싱해 필요한 자식 Coordinator를 순차 push하면서 각 단계의 상태를 주입한다" },
+      { id: "b", text: "각 ViewController가 직접 URL을 파싱해 다음 VC를 present한다" },
+      { id: "c", text: "UIApplication.shared.open(url)을 다시 호출해 OS가 자동으로 화면을 복원하게 한다" },
+      { id: "d", text: "딥링크 처리는 반드시 SwiftUI NavigationStack을 통해서만 가능하다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "Coordinator 트리는 화면 전환 결정 권한이 한곳(루트 Coordinator)에 모여 있어 딥링크 복원에 적합하다. AppCoordinator가 URL을 해석해 \"이 흐름은 로그인됐을 때만 가능 → 로그인 Coordinator 거치고 → Tab Coordinator 거치고 → Order Coordinator 거쳐서 상세 화면\" 같은 *순차 조립*을 수행한다. VC가 직접 처리하면 같은 화면에 도달하는 경로가 늘 때마다 분기 로직이 흩어진다.",
+    relatedTopicSlugs: ["12-design-patterns/coordinator"],
   },
 ];

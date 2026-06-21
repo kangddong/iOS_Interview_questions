@@ -174,7 +174,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "a",
     explanation:
-      "제약 상수를 변경한 뒤, UIView.animate 블록 *안*에서 view.layoutIfNeeded()를 호출해야 변경이 애니메이션으로 보간된다. frame을 직접 수정하거나 layoutIfNeeded를 animate 블록 밖에서 호출하면 애니메이션이 적용되지 않는다.",
+      "Auto Layout은 update constraints → layout → display의 3단계 패스로 돌며, 각 패스는 트리거 메서드로 \"예약\"만 한다. 제약 상수만 바꾸면 변경이 다음 주기에 한 번에 튀므로, UIView.animate 블록 *안*에서 layoutIfNeeded()를 호출해 layout 패스를 즉시 실행시켜야 frame 변화가 보간된다. frame을 직접 수정하면 다음 layout 패스에서 제약대로 되돌아가며 snap back된다.",
     relatedTopicSlugs: ["04-uikit/auto-layout"],
   },
   {
@@ -376,7 +376,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "a",
     explanation:
-      "transform이 적용되면 frame은 변환된 뷰를 감싸는 직사각형(바운딩 박스)으로 변경되어 크기/위치가 달라진다. 반면 bounds와 center는 transform과 독립적으로 유지된다. transform이 적용된 뷰의 frame을 직접 set하면 transform이 깨질 수 있으므로, bounds + center 조합으로 위치와 크기를 다뤄야 한다.",
+      "transform이 적용되면 frame은 변환된 뷰를 감싸는 직사각형(바운딩 박스)으로 변경되어 크기/위치가 달라진다. 반면 bounds와 center는 transform과 독립적으로 유지된다. **transform이 identity가 아닐 때 frame 값은 \"정의되지 않음(undefined)\"** 으로 Apple 문서에 명시되어 있으므로 읽거나 쓰지 말고, bounds + center 조합으로 위치와 크기를 다뤄야 한다.",
     relatedTopicSlugs: ["04-uikit/frame-vs-bounds"],
   },
 
@@ -557,7 +557,7 @@ export const questions: RawExamQuestion[] = [
     level: "intermediate",
     category: "UIKit",
     prompt:
-      "iOS 렌더링 파이프라인에서 Render Server(backboardd)의 역할은?",
+      "iOS 렌더링 파이프라인에서 Render Server(앱 프로세스와 분리된 시스템 데몬)의 역할은?",
     choices: [
       {
         id: "a",
@@ -578,7 +578,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "Render Server(backboardd)는 앱 프로세스와 분리된 별도 프로세스이다. 메인 스레드가 CATransaction.commit()으로 layer 트리의 변경을 전송하면, Render Server가 이를 받아 GPU 명령으로 변환하고, 그림자/마스크/블러 같은 off-screen pass를 처리한 뒤 최종적으로 GPU에 제출한다.",
+      "Render Server는 앱 프로세스와 분리된 별도 시스템 프로세스이다(역사적으로 `backboardd`와 혼용되기도 하지만 같은 프로세스가 아니다). 메인 스레드가 CATransaction.commit()으로 layer 트리의 변경을 전송하면, Render Server가 이를 받아 GPU 명령으로 변환하고, 그림자/마스크/블러 같은 off-screen pass를 처리한 뒤 최종적으로 GPU에 제출한다.",
     relatedTopicSlugs: ["04-uikit/rendering-pipeline"],
   },
   {
@@ -633,7 +633,7 @@ export const questions: RawExamQuestion[] = [
       },
       {
         id: "d",
-        text: "큰 단순 배경 위에 복잡한 콘텐츠를 올리는 패턴은 TBDR에서 불리하다.",
+        text: "TBDR은 over-draw에 영향을 받지 않으므로 알파 블렌딩 비용이 항상 0이다.",
       },
     ],
     correctChoiceId: "b",
@@ -670,7 +670,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "터치 이벤트 처리는 두 단계로 나뉜다. 먼저 Hit-Testing 단계에서 hitTest(_:with:)를 재귀적으로 호출해 터치 좌표가 어느 뷰인지 결정한다. 그 뷰를 first responder로 삼아 Responder Chain을 따라 이벤트를 처리할 수 있는 responder를 찾아 올라간다.",
+      "터치 이벤트 처리는 두 단계로 나뉜다. 먼저 Hit-Testing 단계에서 hitTest(_:with:)를 재귀적으로 호출해 터치 좌표가 어느 뷰인지 결정한다. 그 뷰를 first responder로 삼아 Responder Chain을 따라 이벤트를 처리할 수 있는 responder를 찾아 올라간다. 체인은 view → 상위 view → ViewController → window → UIApplication → AppDelegate(UIResponder 서브클래스) 순으로 거슬러 올라가며, 어디서도 처리하지 않으면 이벤트는 폐기된다.",
     relatedTopicSlugs: ["04-uikit/responder-chain"],
   },
   {
@@ -768,7 +768,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "UIKit은 스크롤·터치 추적 중에 RunLoop 모드를 .default에서 .tracking(UITrackingRunLoopMode)으로 전환한다. .default 모드로만 등록된 타이머는 이 모드에서 실행되지 않는다. 해결책은 RunLoop.current.add(timer, forMode: .common)으로 등록하는 것이다. .common은 .default와 .tracking을 모두 포함한다.",
+      "UIKit은 스크롤·터치 추적 중에 RunLoop 모드를 .default에서 .tracking(UITrackingRunLoopMode)으로 전환한다. .default 모드로만 등록된 타이머는 이 모드에서 실행되지 않는다. 해결책은 RunLoop.current.add(timer, forMode: .common)으로 등록하는 것이다. 엄밀히 `.common`은 모드가 아니라 *common modes 집합에 등록된 모든 모드*(기본적으로 default와 tracking을 포함)에서 소스가 발화되도록 만드는 키이다.",
     relatedTopicSlugs: ["04-uikit/runloop-deep"],
   },
   {
@@ -936,7 +936,7 @@ export const questions: RawExamQuestion[] = [
       },
       {
         id: "b",
-        text: "viewDidLoad 시점에는 뷰가 부모에 추가되지 않아 실제 디바이스 크기가 아닌 storyboard 기준값이거나 .zero일 수 있다. viewDidLayoutSubviews 또는 iOS 17+ viewIsAppearing에서 설정해야 한다.",
+        text: "viewDidLoad 시점에는 뷰가 부모에 추가되지 않아 실제 디바이스 크기가 아닌 storyboard 기준값이거나 .zero일 수 있다. viewDidLayoutSubviews 또는 viewIsAppearing(iOS 17 SDK, iOS 13까지 back-deploy)에서 설정해야 한다.",
       },
       {
         id: "c",
@@ -949,7 +949,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "viewDidLoad 시점에는 뷰가 메모리에 적재됐을 뿐 아직 부모 뷰에 추가되지 않았다. 따라서 view.bounds는 storyboard 기준값이거나 잘못된 크기일 수 있다. 실제 디바이스 화면 크기를 반영한 정확한 frame이 필요하다면 viewDidLayoutSubviews(iOS 16 이하) 또는 iOS 17+ viewIsAppearing에서 설정해야 한다.",
+      "viewDidLoad 시점에는 뷰가 메모리에 적재됐을 뿐 아직 부모 뷰에 추가되지 않았다. 따라서 view.bounds는 storyboard 기준값이거나 잘못된 크기일 수 있다. 실제 디바이스 화면 크기를 반영한 정확한 frame이 필요하다면 viewDidLayoutSubviews 또는 viewIsAppearing(iOS 17 SDK로 도입됐고 iOS 13까지 back-deploy되므로 배포 타깃이 iOS 13 이상이면 Xcode 15+에서 사용 가능)에서 설정해야 한다.",
     relatedTopicSlugs: ["04-uikit/viewcontroller-lifecycle"],
   },
   {
@@ -980,6 +980,59 @@ export const questions: RawExamQuestion[] = [
     correctChoiceId: "b",
     explanation:
       ".overFullScreen이나 .overCurrentContext 같은 모달 방식은 하단의 뷰 컨트롤러(A)를 시각적으로 보존하기 때문에 A의 viewWillDisappear/viewDidDisappear가 호출되지 않는다. 반면 full screen 모달이나 push는 A가 화면에서 완전히 사라지므로 disappear 콜백이 호출된다. 이 차이를 인지하지 못하면 disappear 시점에 의존하는 로직(타이머 중지, 리소스 해제 등)이 예상대로 동작하지 않을 수 있다.",
+    relatedTopicSlugs: ["04-uikit/viewcontroller-lifecycle"],
+  },
+
+  // ─── auto-layout-deepdive (add: 3) ───────────────────────────────────────
+  {
+    id: "objective-c04-advanced-transform-and-autolayout-001",
+    type: "objective",
+    level: "advanced",
+    category: "UIKit",
+    prompt: "Auto Layout이 켜진 뷰에 `transform = CGAffineTransform(scaleX: 1.2, y: 1.2)`을 적용한 뒤 레이아웃 패스가 한 번 더 돌면 어떤 일이 일어나는가?",
+    choices: [
+      { id: "a", text: "다음 레이아웃 패스에서 transform이 identity로 초기화된다" },
+      { id: "b", text: "center와 bounds는 제약대로 다시 결정되고, transform은 그대로 유지되어 그 위에 합성된다" },
+      { id: "c", text: "transform이 frame을 덮어써 제약이 무시된다" },
+      { id: "d", text: "Auto Layout 시스템이 자동으로 transform을 분해해 별도 제약으로 등록한다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "Auto Layout은 뷰의 *center와 bounds(정렬 사각형)* 만 제어한다. `transform`은 그 결과 위에 별도로 합성되는 시각 변환이라 레이아웃 패스가 다시 돌아도 초기화되지 않는다. 그래서 일시적 효과(버튼 눌림, 흔들기)는 transform으로 처리해도 안전하다. 단, transform이 identity가 아닐 때 `frame` 값은 Apple 문서상 \"정의되지 않음\"이므로 위치 계산은 center/bounds 기반으로 해야 한다.",
+    relatedTopicSlugs: ["04-uikit/auto-layout"],
+  },
+  {
+    id: "objective-c04-intermediate-calayer-autolayout-001",
+    type: "objective",
+    level: "intermediate",
+    category: "UIKit",
+    prompt: "직접 추가한 `CAGradientLayer`가 부모 뷰 크기 변경 시 따라가지 않는다. 가장 정석적인 해결책은?",
+    choices: [
+      { id: "a", text: "CAGradientLayer에 NSLayoutConstraint를 추가한다" },
+      { id: "b", text: "부모 UIView의 `layoutSubviews()`에서 `gradientLayer.frame = bounds`로 동기화한다" },
+      { id: "c", text: "CAGradientLayer를 UIView로 감싸면 자동으로 Auto Layout이 적용된다" },
+      { id: "d", text: "CATransaction에 등록하면 시스템이 자동으로 frame을 맞춰준다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "직접 추가한 CALayer(서브레이어)는 NSLayoutConstraint의 대상이 아니다. 제약은 UIView에만 걸리고, 그 안의 sublayer는 수동 frame 갱신이 필요하다. 부모 뷰의 `layoutSubviews()`(또는 VC의 `viewDidLayoutSubviews()`)에서 `layer.frame = bounds`로 매 레이아웃 패스마다 동기화해야 한다. 이 함정 때문에 `viewDidLoad`에서 frame을 잡으면 그 시점의 bounds가 최종값이 아니라 어긋난다.",
+    relatedTopicSlugs: ["04-uikit/auto-layout", "04-uikit/core-animation"],
+  },
+  {
+    id: "objective-c04-intermediate-didmovetowindow-001",
+    type: "objective",
+    level: "intermediate",
+    category: "UIKit",
+    prompt: "반복 펄스 애니메이션을 시작/정지하기에 가장 적절한 콜백은?",
+    choices: [
+      { id: "a", text: "`init` — 객체가 만들어지는 시점이라 가장 안전하다" },
+      { id: "b", text: "`viewDidLoad` — 뷰가 로드되었으므로 곧바로 시작한다" },
+      { id: "c", text: "`didMoveToWindow()` — `window != nil`이면 시작, `nil`이면 정지" },
+      { id: "d", text: "`layoutSubviews()` — 매 레이아웃마다 시작·정지를 반복한다" },
+    ],
+    correctChoiceId: "c",
+    explanation:
+      "뷰가 superview에 추가됐다고 해서 화면에 보이는 건 아니다. 윈도우에 붙어야 진짜 화면에 등장한다. `didMoveToWindow()`에서 `window != nil`로 가드해 시작하고, `window == nil`이면 정지하면 화면에서 내려갔을 때 자동으로 리소스(애니메이션·타이머·DisplayLink)를 회수할 수 있다. `viewDidLoad`/`init`은 아직 윈도우에 없는 시점이라 부적절하고, `layoutSubviews`는 자주 호출되므로 부적절하다.",
     relatedTopicSlugs: ["04-uikit/viewcontroller-lifecycle"],
   },
 ];

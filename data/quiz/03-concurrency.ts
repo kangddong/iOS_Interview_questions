@@ -127,7 +127,7 @@ export const questions: RawExamQuestion[] = [
       { id: "a", text: "`.bufferingNewest(100)`" },
       { id: "b", text: "`.bufferingOldest(100)`" },
       { id: "c", text: "`.unbounded`" },
-      { id: "d", text: "`.dropping(100)`" },
+      { id: "d", text: "`.bufferingOldest(1)`" },
     ],
     correctChoiceId: "a",
     explanation:
@@ -444,15 +444,15 @@ export const questions: RawExamQuestion[] = [
     level: "basic",
     category: "Concurrency",
     prompt:
-      "Swift Concurrency에서 `TaskPriority.background`로 설정된 Task가 `.userInitiated` Task를 기다리고 있을 때 발생하는 현상은?",
+      "Swift Concurrency에서 `.userInitiated` Task가 `.background` 우선순위 actor/Task의 완료를 await하고 있을 때 런타임이 수행하는 동작은?",
     choices: [
       {
         id: "a",
-        text: "런타임이 priority escalation을 통해 대기 중인 작업의 우선순위를 임시로 끌어올린다.",
+        text: "런타임이 점유 중(낮은 우선순위)인 작업의 우선순위를 호출자(높은 우선순위)에 맞춰 임시로 승격(priority escalation)시킨다.",
       },
       {
         id: "b",
-        text: "background Task는 userInitiated Task가 완료될 때까지 영원히 대기하며 우선순위 변화는 없다.",
+        text: "대기 중인 userInitiated Task의 우선순위를 background로 떨어뜨려 맞춘다.",
       },
       {
         id: "c",
@@ -465,7 +465,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "a",
     explanation:
-      "Swift Concurrency 런타임은 Priority Inversion을 완화하기 위해 높은 우선순위 작업이 낮은 우선순위 actor/Task를 기다릴 때, 현재 점유자의 우선순위를 임시로 끌어올리는 priority escalation을 수행합니다.",
+      "Priority inversion은 높은 우선순위 작업이 낮은 우선순위 작업의 완료를 기다릴 때 발생한다. Swift Concurrency 런타임은 *기다림의 대상이 된 낮은 우선순위 작업*을 호출자 우선순위에 맞춰 임시로 승격(escalation)시켜 역전을 완화한다. waiter(높은 쪽)를 끌어내리는 게 아니라 점유자(낮은 쪽)를 끌어올리는 방향이라는 점이 핵심.",
     relatedTopicSlugs: ["03-concurrency/concurrency-runtime"],
   },
 
@@ -1079,5 +1079,41 @@ export const questions: RawExamQuestion[] = [
     explanation:
       "Swift 6에서 전역 mutable 변수는 기본적으로 동시성 위험으로 에러가 됩니다. `nonisolated(unsafe)`를 붙이면 컴파일러의 격리 검사를 통과하지만, thread safety에 대한 책임은 전적으로 개발자에게 있습니다. 실제로 안전하게 하려면 actor 또는 lock으로 보호하는 wrapper가 필요합니다.",
     relatedTopicSlugs: ["03-concurrency/swift6-strict"],
+  },
+
+  // ─── main-actor-and-cancellation (add: 2) ────────────────────────────────
+  {
+    id: "objective-c03-intermediate-main-actor-isolation-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Concurrency",
+    prompt: "타입에 `@MainActor`를 붙였을 때 그 안의 `nonisolated` 메서드의 동작은?",
+    choices: [
+      { id: "a", text: "여전히 메인 액터에서 호출돼야 한다 (타입 어노테이션이 우선)" },
+      { id: "b", text: "어느 컨텍스트에서든 await 없이 호출 가능하며, 내부에서 main-actor isolated 멤버에 접근하려면 `await MainActor.run` 등으로 hop이 필요하다" },
+      { id: "c", text: "Swift 6에선 컴파일 에러가 된다" },
+      { id: "d", text: "자동으로 background actor에 격리된다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "타입 레벨 `@MainActor`는 멤버 기본 격리를 main actor로 정한다. 개별 멤버에 `nonisolated`를 붙이면 그 멤버만 격리에서 빠져나와 어디서든 동기 호출이 가능하다. 단 그 안에서 main-actor isolated 프로퍼티/메서드에 접근하려면 await(MainActor.run 등)로 메인 액터로 hop해야 한다. 프로토콜 적합처럼 메인 액터를 강제할 수 없는 자리에서 흔히 사용한다.",
+    relatedTopicSlugs: ["03-concurrency/actor-and-mainactor"],
+  },
+  {
+    id: "objective-c03-intermediate-check-cancellation-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Concurrency",
+    prompt: "긴 동기 루프를 도는 `async` 함수에서 Task 취소를 협조적으로 반영하려면 무엇을 해야 하는가?",
+    choices: [
+      { id: "a", text: "Task가 취소되면 Swift 런타임이 루프를 자동 종료시키므로 추가 작업이 필요 없다" },
+      { id: "b", text: "루프 안에서 주기적으로 `try Task.checkCancellation()`을 호출하거나 `Task.isCancelled`를 검사해 직접 종료한다" },
+      { id: "c", text: "`Thread.exit()`를 호출해 스레드를 강제 종료한다" },
+      { id: "d", text: "`Task.sleep`을 한 번 넣으면 자동으로 취소가 반영된다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "Swift Concurrency의 취소는 *협조적*이다. 런타임이 동기 루프를 강제로 끊지 않는다. 따라서 작업 단위 사이에 `try Task.checkCancellation()`(취소되면 `CancellationError` throw) 또는 `if Task.isCancelled { return }` 검사를 직접 끼워야 한다. `Task.sleep`은 그 호출 지점에서 취소를 감지하지만 그 외 구간엔 영향을 주지 않는다.",
+    relatedTopicSlugs: ["03-concurrency/task-and-cancellation"],
   },
 ];

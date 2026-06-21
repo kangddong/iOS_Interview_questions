@@ -259,7 +259,7 @@ export const questions: RawExamQuestion[] = [
       },
       {
         id: "b",
-        text: "body가 호출될 때마다 정렬 연산이 반복 실행되므로, 정렬된 결과를 @Observable store에 캐시하고 body에서는 읽기만 해야 한다",
+        text: "body가 호출될 때마다 정렬 연산이 반복 실행되므로, 정렬된 결과를 ViewModel/`@Observable`(iOS 17+, Swift 5.9+) store에 캐시하고 body에서는 읽기만 해야 한다",
       },
       {
         id: "c",
@@ -330,7 +330,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "c",
     explanation:
-      "`0x8badf00d`는 'ate bad food'를 숫자로 표현한 것으로, 앱이 시작(또는 포그라운드 복귀) 시간 제한 내에 응답하지 못해 watchdog에 의해 강제 종료된 경우입니다. `0xbaaaaaad`는 메인 스레드 응답 없음, `0xdeadfa11`은 사용자 Force Quit, `SIGABRT`는 `fatalError`/`assert` 실패입니다.",
+      "`0x8badf00d`는 'ate bad food'를 숫자로 표현한 것으로, 앱이 시작·포그라운드·백그라운드 전환 등에서 메인 스레드가 시간 제한 내에 응답하지 못해 watchdog에 의해 강제 종료된 경우입니다. **`0xbaaaaaad`는 크래시 코드가 아니라 시스템 stackshot 마커**(시스템 전체 스냅샷용)이므로 크래시 분류 시 혼동하면 안 됩니다. `0xdeadfa11`은 사용자 Force Quit, `SIGABRT`는 `fatalError`/`assert` 실패입니다.",
     relatedTopicSlugs: ["10-performance/metrickit-and-crash"],
   },
   {
@@ -471,5 +471,41 @@ export const questions: RawExamQuestion[] = [
     explanation:
       "메인 스레드가 정상이어도 hitch가 발생하는 경우는 Commit 단계 비용이나 GPU/Render Server 정체가 원인입니다. 특히 큰 텍스처 합성, 복잡한 shader, 메모리 압박으로 인한 텍스처 swap은 GPU 영역 문제로 **Instruments → Metal System Trace**로 확인해야 합니다. Time Profiler나 Animation Hitches만으로는 이 원인을 발견하기 어렵습니다.",
     relatedTopicSlugs: ["10-performance/rendering-budget-and-hitch"],
+  },
+
+  // ─── image-and-scroll (add: 2) ───────────────────────────────────────────
+  {
+    id: "objective-c10-intermediate-image-downsampling-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Performance",
+    prompt: "스크롤되는 셀에 4096×4096 원본 이미지를 100×100 thumbnail로 표시할 때, 메모리·디코딩 비용을 최소화하는 가장 정석적인 방법은?",
+    choices: [
+      { id: "a", text: "`UIImage(named:)`로 불러와 `imageView.contentMode = .scaleAspectFit`만 설정한다" },
+      { id: "b", text: "ImageIO의 `CGImageSourceCreateThumbnailAtIndex(_:_:_)`에 `kCGImageSourceCreateThumbnailFromImageAlways: true`와 `kCGImageSourceThumbnailMaxPixelSize: 100`을 주어 원본 디코딩 없이 작게 디코드한다" },
+      { id: "c", text: "이미지 url을 매번 URLSession.dataTask로 다시 받아온다" },
+      { id: "d", text: "`UIGraphicsBeginImageContext`로 전체 이미지를 메모리에 그린 뒤 crop한다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "`UIImage(named:)`는 표시 시점에 전체 원본을 픽셀 버퍼로 디코드해 4096×4096×4B ≒ 64MB 메모리를 잡는다. ImageIO의 `CGImageSourceCreateThumbnailAtIndex`는 *디코드 단계에서 바로 축소된 비트맵*을 만들어 메모리·CPU·디스크 IO 모두 크게 줄인다. `kCGImageSourceCreateThumbnailFromImageAlways: true`는 원본에 미리 박힌 EXIF 썸네일이 작아도 무시하고 항상 원본에서 다운샘플하도록 강제한다.",
+    relatedTopicSlugs: ["10-performance/image-and-scroll"],
+  },
+  {
+    id: "objective-c10-intermediate-offscreen-rendering-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Performance",
+    prompt: "다음 중 GPU에서 *off-screen rendering* 패스를 유발해 스크롤 hitch를 일으킬 수 있는 조합은?",
+    choices: [
+      { id: "a", text: "`shadowPath`가 명시된 단색 배경 view에 그림자만 적용" },
+      { id: "b", text: "`cornerRadius` + `masksToBounds = true` + 셀 안의 복잡한 image 내용" },
+      { id: "c", text: "Auto Layout 제약을 stack view로 묶어 정렬" },
+      { id: "d", text: "`UIView.animate`로 transform scale 애니메이션" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "GPU가 마스크를 입히려면 자식 콘텐츠를 별도 텍스처로 먼저 그린 뒤 합성해야 하므로, `cornerRadius + masksToBounds`가 비단순 콘텐츠 위에서 동작하면 off-screen pass가 추가된다. 그림자도 `shadowPath`를 지정하지 않으면 알파 채널에서 모양을 매번 계산하므로 같은 문제가 생긴다 — 반대로 `shadowPath`를 주면 미리 계산되어 off-screen이 사라진다. transform 애니메이션과 Auto Layout은 그 자체로 off-screen 패스를 유발하지 않는다.",
+    relatedTopicSlugs: ["10-performance/image-and-scroll", "04-uikit/core-animation"],
   },
 ];

@@ -990,4 +990,57 @@ export const questions: RawExamQuestion[] = [
       "Swift의 generic class는 ObjC 런타임이 이해하는 형태로 노출할 수 없어 직접 @objc 노출이 불가합니다. 해결 방법으로는 (1) 특정 타입으로 concrete subclass를 만들어 @objc 노출하거나, (2) 내부에 generic을 쓰고 외부에 type-erased wrapper class를 @objc로 제공하는 방법을 사용합니다.",
     relatedTopicSlugs: ["17-objective-c/swift-interop"],
   },
+
+  // ─── arc-hotpath-optimization (add: 3) ───────────────────────────────────
+  {
+    id: "objective-c17-advanced-arc-hotpath-001",
+    type: "objective",
+    level: "advanced",
+    category: "Objective-C",
+    prompt: "스크롤 핫패스 루프에서 self.manager 같은 프로퍼티 접근을 반복할 때 ARC 관점에서 가장 효과적인 최적화는?",
+    choices: [
+      { id: "a", text: "지역 `let manager = self.manager`로 한 번만 retain하고 루프 안에선 해당 지역 변수만 사용한다" },
+      { id: "b", text: "루프를 별도 `DispatchQueue.global()`로 옮긴다" },
+      { id: "c", text: "self를 `weak`로 캡처하면 retain/release가 사라진다" },
+      { id: "d", text: "`@inline(__always)`를 self의 getter에 붙이면 ARC가 제거된다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "self의 클래스 프로퍼티 getter를 핫패스 루프 안에서 반복 호출하면 반복마다 retain(+1)/release(-1) 쌍이 끼어들어 atomic inc/dec 비용이 누적된다. 지역 `let`에 한 번만 바인딩(=hoisting)하면 retain은 1회로 끝나고 루프 내부는 추가 ARC 트래픽 없이 진행된다. 더 적극적으로는 값 타입 사용·`withExtendedLifetime`·`borrowing`/`consuming` 한정자(Swift 5.9+)로 복사 자체를 차단할 수 있다.",
+    relatedTopicSlugs: ["17-objective-c/arc-and-mrc"],
+  },
+  {
+    id: "objective-c17-advanced-arc-hotpath-002",
+    type: "objective",
+    level: "advanced",
+    category: "Objective-C",
+    prompt: "제네릭 함수 `process<T>(_ x: T)`가 컴파일러에 의해 특수화(specialization)되었을 때 ARC 관점에서 일어나는 변화는?",
+    choices: [
+      { id: "a", text: "T가 값 타입(Int 등)으로 특수화되면 ARC retain/release 자체가 제거된다" },
+      { id: "b", text: "특수화는 ARC와 무관하며 retain/release 호출 수는 동일하다" },
+      { id: "c", text: "특수화는 항상 클래스 인스턴스를 값 타입처럼 다루도록 만든다" },
+      { id: "d", text: "특수화되면 컴파일러가 자동으로 `weak`로 바꿔 사이클을 방지한다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "범용 제네릭 본문은 T의 정체를 모르므로 보수적으로 retain/release를 끼우고 witness table을 통해 호출한다. 특정 호출처에서 T가 `Int`(값 타입)로 특수화되면 ARC 대상이 아니므로 retain/release가 통째로 제거된다. T가 클래스로 특수화되면 컴파일러가 정확한 타입을 알아 불필요한 retain/release를 더 공격적으로 제거할 수 있다. 단, 모듈 경계를 넘으면 호출처에서 본문을 볼 수 없으므로 라이브러리에선 `@inlinable`이 필요하다.",
+    relatedTopicSlugs: ["17-objective-c/arc-and-mrc", "01-swift-language/generics-and-pat"],
+  },
+  {
+    id: "objective-c17-intermediate-lightweight-generics-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Objective-C",
+    prompt: "Objective-C의 lightweight generics (`NSArray<NSString *> *`)가 Swift 인터롭에서 갖는 역할은?",
+    choices: [
+      { id: "a", text: "Swift 쪽에서 `[String]`처럼 정확한 element 타입을 가진 배열로 가져올 수 있게 해준다" },
+      { id: "b", text: "Objective-C 런타임에 진짜 제네릭을 추가해 type check를 강제한다" },
+      { id: "c", text: "Swift 5.9 parameter packs로 자동 변환된다" },
+      { id: "d", text: "ARC와 통합되어 element가 자동으로 weak 참조가 된다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "lightweight generics는 ObjC 컴파일러와 Swift 브리지를 위한 *타입 어노테이션*일 뿐 ObjC 런타임에 진짜 제네릭이 추가되는 건 아니다(소거된다). 그러나 Swift import 시점에 이 정보를 사용해 `NSArray *`를 `[Any]`가 아닌 `[String]`처럼 정확한 element 타입으로 가져올 수 있게 해 준다. 그 결과 캐스팅 코드가 줄고 타입 안전성이 올라간다.",
+    relatedTopicSlugs: ["17-objective-c/swift-interop"],
+  },
 ];
