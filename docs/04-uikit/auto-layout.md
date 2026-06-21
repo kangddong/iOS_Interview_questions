@@ -34,7 +34,51 @@ override var intrinsicContentSize: CGSize {
 }
 ```
 
-값이 바뀌면 `invalidateIntrinsicContentSize()` 호출해야 layout 재계산.
+값이 바뀌면 `invalidateIntrinsicContentSize()`를 호출해야 layout 재계산. 즉, **컨텐츠 변경 → invalidate → 다음 update constraints 패스에서 새 intrinsic 반영 → layout 패스로 frame 재확정** 순서.
+
+자주 놓치는 케이스:
+
+- 커스텀 뷰의 텍스트/이미지가 바뀌었는데 `invalidateIntrinsicContentSize()`를 안 부르면 부모 stack/제약은 옛 크기 그대로 잡고 있다.
+- `UILabel`/`UIImageView`는 시스템이 자동 호출해주지만, *커스텀 그리기*나 외부에서 상태를 주입하는 뷰는 직접 호출 책임.
+
+## 동적 셀 높이 (Self-Sizing Cells)
+
+테이블/컬렉션 뷰에서 셀 높이를 콘텐츠에 맞추는 표준 패턴은 *intrinsic 기반*이다.
+
+```swift
+tableView.rowHeight = UITableView.automaticDimension
+tableView.estimatedRowHeight = 60   // 초기 스크롤 성능을 위한 추정치
+```
+
+전제: 셀의 contentView에 **위→아래로 끊김 없이 연결된 vertical 제약** + 모든 자식 뷰가 `intrinsicContentSize`를 가지거나 명시적 height 제약을 가짐. 한 곳이라도 끊기면 "ambiguous height"로 추정값 그대로 굳거나 로그가 폭주한다.
+
+높이가 콘텐츠 변화로 바뀌어야 할 때(다국어 텍스트 갱신 등):
+
+```swift
+tableView.beginUpdates()
+tableView.endUpdates()         // 같은 셀들에 대해 높이만 다시 측정 + 애니메이션
+// 또는 iOS 11+
+tableView.performBatchUpdates(nil)
+```
+
+`reloadData()`는 셀이 다 재생성되어 스크롤 위치/포커스가 흔들리므로 *높이만 갱신*할 땐 위 방식이 낫다.
+
+## safeAreaInsetsDidChange
+
+노치/홈 인디케이터/키보드 등으로 **safe area가 바뀔 때 호출**되는 콜백. 키보드 등장·회전·iPad multitasking 폭 변경 시 같이 불린다.
+
+```swift
+override func safeAreaInsetsDidChange() {
+    super.safeAreaInsetsDidChange()
+    // safeAreaInsets 의존해 그라디언트/그림자/배경 위치를 재계산
+}
+```
+
+주의:
+
+- `viewDidLoad`에서 `view.safeAreaInsets`를 읽으면 `.zero`인 경우가 많다. 의미 있는 값은 첫 레이아웃 패스 이후.
+- 대부분의 제약 기반 레이아웃은 `safeAreaLayoutGuide`만 쓰면 *자동으로* 재배치된다. `safeAreaInsetsDidChange`는 *제약이 아닌 직접 그리는 콘텐츠*(layer frame, draw rect)나 inset 의존 계산을 갱신할 때만 필요.
+- `additionalSafeAreaInsets`를 컨테이너에 주면 자식 VC들이 그만큼 안쪽으로 밀린다 — 커스텀 툴바를 띄울 때 유용.
 
 ## 코드로 제약 짜기 (NSLayoutAnchor)
 
@@ -57,27 +101,82 @@ NSLayoutConstraint.activate([
 
 대부분 leading/trailing 사용. RTL 대응이 자동으로 됨.
 
-## Layout 사이클
+## Layout 사이클 — 3단계 패스
 
-```
-setNeedsLayout       → 다음 사이클에 layout 다시
-layoutIfNeeded       → 즉시 layout
-                      ↓
-updateConstraints    → 제약 갱신
-layoutSubviews       → frame 결정
-draw(_:)             → (필요 시) 그리기
+Auto Layout 엔진은 뷰 라이프사이클 위에서 **3단계 패스**로 돈다. 이 구조를 머릿속에 넣으면 "왜 어디서는 frame이 먹고 어디서는 안 먹는지"가 전부 설명된다.
+
+| 단계 | 패스 | 직접 호출 | 예약(트리거) | 즉시 실행 |
+|---|---|---|---|---|
+| 1 | **Update constraints** (제약 갱신) | `updateConstraints` / `updateViewConstraints` | `setNeedsUpdateConstraints()` | `updateConstraintsIfNeeded()` |
+| 2 | **Layout** (frame 확정) | `layoutSubviews` / `viewDidLayoutSubviews` | `setNeedsLayout()` | `layoutIfNeeded()` |
+| 3 | **Display** (그리기) | `draw(_:)` | `setNeedsDisplay()` | (다음 화면 갱신) |
+
+각 패스는 직접 호출하지 않고 **트리거 메서드로 "예약"** 만 한다. 실제 실행은 다음 화면 갱신 주기. 즉시 돌리고 싶을 때만 `layoutIfNeeded()` 같은 *...IfNeeded* 호출.
+
+### frame이 "먹는 곳"과 "안 먹는 곳"
+
+`translatesAutoresizingMaskIntoConstraints = false`인 뷰에 `view.frame = ...`을 직접 세팅해도 **2단계 레이아웃 패스에서 제약 기반으로 다시 계산되며 덮어쓴다.** "frame이 안 먹는" 듯 보이는 이유.
+
+반대로 frame을 만져도 되는(정확히는 만져야 하는) 곳은 **레이아웃 패스가 끝난 직후**:
+
+- `viewDidLoad()` — 뷰는 존재하지만 `view.bounds`는 아직 storyboard/이전 화면 기준. 제약 설정은 OK, **frame 계산은 NG**.
+- `viewDidLayoutSubviews()` / `layoutSubviews()` — 제약이 모두 풀려 frame이 확정된 직후. frame 의존 작업은 전부 여기.
+
+자세한 콜백 시점은 [viewcontroller-lifecycle](viewcontroller-lifecycle.md) 참조.
+
+### CALayer는 Auto Layout을 안 탄다
+
+`CAGradientLayer`, `CAShapeLayer`처럼 직접 추가한 레이어는 **제약의 영향을 받지 않는다.** frame을 수동으로 갱신해야 하고, 그 자리가 `layoutSubviews()`. (자세한 패턴: [core-animation](core-animation.md#calayer는-auto-layout을-안-탄다))
+
+```swift
+override func layoutSubviews() {
+    super.layoutSubviews()
+    gradientLayer.frame = bounds                       // 레이어는 수동
+    circleView.layer.cornerRadius = bounds.height / 2  // bounds 의존 → 여기서
+}
 ```
 
-애니메이션에서 제약을 *애니메이팅* 하려면:
+`cornerRadius`를 `viewDidLoad`에서 `bounds.height/2`로 잡으면 원이 안 되는 이유도 같다. 그 시점의 bounds는 최종값이 아니다.
+
+## transform × Auto Layout
+
+**핵심 규칙**: Auto Layout은 뷰의 `center`와 `bounds`(정렬 사각형)로 위치를 잡고, `transform`은 그 위에 별도로 얹힌다.
+
+- `transform`(scale/rotate)은 **레이아웃 패스가 돌아도 초기화되지 않는다**. `center`/`bounds`는 제약이 정하고, `transform`은 그 위에 합성.
+- `transform`이 identity가 **아닐 때 `frame` 값은 "정의되지 않음"** (Apple 문서 명시). 이때 frame을 읽거나 쓰면 안 된다. 위치 계산은 `center`와 `bounds`로.
+
+**실무 원칙 — 하나만 골라라**: 일시적 시각 효과(버튼 눌림, 흔들기, 팝 애니메이션)는 `transform`으로, **영구적 레이아웃 변화**(펼침/접힘, 크기 변경)는 *제약*으로.
+
+## 애니메이션 — 두 갈래
+
+Auto Layout을 쓰면 애니메이션 방식이 둘로 갈린다.
+
+### (A) 제약(constraint) 애니메이션 — 레이아웃 자체를 바꿀 때
 
 ```swift
 heightConstraint.constant = 200
 UIView.animate(withDuration: 0.3) {
-    self.view.layoutIfNeeded()    // 이 호출이 있어야 변경이 보간됨
+    self.view.layoutIfNeeded()    // 블록 안에서 레이아웃 패스를 "즉시" 실행
 }
 ```
 
-`frame`을 직접 바꾸지 말고 *제약*을 바꾼 뒤 `layoutIfNeeded`를 애니메이션 블록 안에서 호출하는 패턴이 핵심.
+`layoutIfNeeded()`가 핵심. 상수만 바꾸면 변화는 *다음 주기에 한 번에 튀어* 버린다. 애니메이션 블록 안에서 `layoutIfNeeded()`를 호출해 프레임 변화 과정을 보간(interpolate)시켜야 부드럽게 움직인다. 보통 변경된 제약이 속한 **공통 부모 뷰**에 대고 호출.
+
+### (B) transform 애니메이션 — 레이아웃을 안 건드릴 때
+
+```swift
+UIView.animate(withDuration: 0.3) {
+    self.iconView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+}
+// 복귀
+UIView.animate(withDuration: 0.3) { self.iconView.transform = .identity }
+```
+
+`layoutIfNeeded()` 불필요. `transform`은 *레이아웃 변화가 아니라 렌더링 변형*이라 GPU에서 싸게 처리되고 제약과 충돌하지 않는다.
+
+### 피해야 할 패턴
+
+Auto Layout이 켜진 뷰의 **`.frame`을 직접 애니메이션**하지 마라. 다음 레이아웃 패스에서 제약대로 되돌아가며 *snap back* 한다.
 
 ## 우선순위 충돌 디버깅
 
@@ -118,6 +217,21 @@ UIView.animate(withDuration: 0.3) {
 
 - **Q. layout이 무한 루프?**
   `layoutSubviews`에서 제약 추가/변경하면 다시 layout 사이클 → 무한 루프 가능. 제약 변경은 `updateConstraints`나 적절한 액션 시점에.
+
+- **Q. `viewDidLoad`에서 `cornerRadius = bounds.height / 2`로 잡으면 원이 안 되는 이유?**
+  그 시점의 `bounds`는 storyboard/이전 화면 기준이라 최종값이 아니다. `viewDidLayoutSubviews`(또는 셀이면 `layoutSubviews`)에서 잡아야 한다. → [viewcontroller-lifecycle](viewcontroller-lifecycle.md#viewdidload에서-frame을-쓰면-안-되는-이유)
+
+- **Q. `transform = scale(1.2)` 적용 후 `frame`을 읽으면?**
+  값이 "정의되지 않음". `transform`이 identity가 아닐 때 `frame`은 읽지도 쓰지도 마라 — `center`와 `bounds`로 계산.
+
+- **Q. 제약을 바꿨는데 애니메이션이 튐 / 즉시 점프?**
+  애니메이션 블록 *안*에서 `layoutIfNeeded()`를 호출하지 않아서. 그러면 변경이 다음 주기에 한 번에 적용되어 보간이 안 일어난다. 공통 부모 뷰에 대고 블록 안에서 호출.
+
+- **Q. self-sizing 셀이 첫 스크롤 시 살짝 튄다?**
+  `estimatedRowHeight`가 실제 평균과 너무 동떨어졌을 때. 측정 후 실제값으로 교체되며 contentSize/contentOffset이 보정되어 흔들림이 보인다. 추정치를 실제 평균에 가깝게 주거나, 가능하면 고정 높이.
+
+- **Q. 키보드가 올라왔는데 `safeAreaInsets`로 받지 못한다?**
+  iPhone에서 키보드는 `safeAreaInsets`에 반영되지 않는다(iPad floating은 일부 반영). `UIResponder.keyboardWillShowNotification`로 직접 처리하거나 `keyboardLayoutGuide`(iOS 15+) 사용.
 
 ## 참고
 

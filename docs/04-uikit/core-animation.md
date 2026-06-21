@@ -15,6 +15,20 @@ view.layer.shadowOpacity = 0.2
 - 시각 표현(코너, 그림자, 마스크, transform)은 거의 layer 속성.
 - UIView는 layer 위에 *터치 처리* 같은 기능을 추가한 컨테이너.
 
+## CALayer는 Auto Layout을 안 탄다
+
+`CAGradientLayer`, `CAShapeLayer`처럼 **UIView에 직접 추가한 sublayer는 Auto Layout 제약의 영향을 받지 않는다.** 그래서 부모 뷰 크기가 바뀌면 레이어 frame은 그대로 남고 어긋난다. 갱신은 `layoutSubviews()` (커스텀 뷰) 또는 `viewDidLayoutSubviews()` (VC)에서 직접:
+
+```swift
+override func layoutSubviews() {
+    super.layoutSubviews()
+    gradientLayer.frame = bounds                       // 매 레이아웃 패스마다 동기화
+    circleView.layer.cornerRadius = bounds.height / 2  // bounds 의존 → 여기서
+}
+```
+
+같은 이유로 `cornerRadius = bounds.height / 2`를 `viewDidLoad`에서 잡으면 그 시점 `bounds`가 최종값이 아니라 원이 안 된다. → 자세히는 [Auto Layout 3단계 패스](auto-layout.md#layout-사이클--3단계-패스)
+
 ## Implicit vs Explicit Animation
 
 ```swift
