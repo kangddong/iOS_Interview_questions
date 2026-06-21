@@ -339,11 +339,11 @@ export const questions: RawExamQuestion[] = [
       { id: "a", text: "관찰 대상 클래스가 Codable 프로토콜을 채택해야 한다" },
       { id: "b", text: "관찰 대상 클래스가 NSObject를 상속해야 한다" },
       { id: "c", text: "관찰할 프로퍼티에 @objc dynamic을 붙여야 한다" },
-      { id: "d", text: "ObjC 런타임에 의존하므로 순수 Swift struct에는 사용할 수 없다" },
+      { id: "d", text: "관찰자가 NSKeyValueObservation 결과를 보관해 관찰 수명을 유지해야 한다" },
     ],
     correctChoiceId: "a",
     explanation:
-      "KVO는 ObjC 런타임 기반으로, 관찰 대상 클래스가 NSObject를 상속하고 관찰할 프로퍼티에 `@objc dynamic`이 붙어야 합니다. Codable 채택은 JSON 직렬화와 관련된 것으로 KVO와 무관합니다. 순수 Swift struct에는 KVO를 사용할 수 없으며, 이 경우 Combine이나 @Observable이 대안입니다.",
+      "KVO의 *필수 조건*은 (1) NSObject 상속, (2) 관찰 프로퍼티에 `@objc dynamic`, (3) 관찰자 측에서 `NSKeyValueObservation` 토큰을 유지하는 것입니다. Codable 채택은 JSON 직렬화와 관련된 것으로 KVO와 무관합니다. 참고: KVO가 ObjC 런타임에 의존하므로 순수 Swift struct에는 사용할 수 없고, 이 경우 Combine이나 @Observable이 대안입니다 — 이는 *조건*이 아니라 *제약*입니다.",
     relatedTopicSlugs: ["12-design-patterns/observer"],
   },
   {

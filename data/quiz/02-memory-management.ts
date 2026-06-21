@@ -412,7 +412,7 @@ export const questions: RawExamQuestion[] = [
     choices: [
       {
         id: "a",
-        text: "`viewModel.onUpdate = { self.label.text = $0 }` — self가 onUpdate를 보유",
+        text: "`self.viewModel.onUpdate = { self.label.text = $0 }` — self가 viewModel을 strong으로 보유하고, viewModel이 onUpdate(self를 캡처한 closure)를 보유하여 self↔viewModel 사이클이 닫힘",
       },
       {
         id: "b",
@@ -762,9 +762,9 @@ export const questions: RawExamQuestion[] = [
     relatedTopicSlugs: ["02-memory-management/value-type-memory"],
   },
   {
-    id: "objective-c02-basic-value-type-memory-002",
+    id: "objective-c02-advanced-value-type-memory-002",
     type: "objective",
-    level: "basic",
+    level: "advanced",
     category: "Memory",
     prompt:
       "Swift `borrowing` 파라미터(Swift 5.9+)가 메모리 최적화에 기여하는 방식은?",

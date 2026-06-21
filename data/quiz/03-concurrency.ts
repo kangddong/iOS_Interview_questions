@@ -127,7 +127,7 @@ export const questions: RawExamQuestion[] = [
       { id: "a", text: "`.bufferingNewest(100)`" },
       { id: "b", text: "`.bufferingOldest(100)`" },
       { id: "c", text: "`.unbounded`" },
-      { id: "d", text: "`.dropping(100)`" },
+      { id: "d", text: "`.bufferingOldest(1)`" },
     ],
     correctChoiceId: "a",
     explanation:
@@ -444,15 +444,15 @@ export const questions: RawExamQuestion[] = [
     level: "basic",
     category: "Concurrency",
     prompt:
-      "Swift Concurrency에서 `TaskPriority.background`로 설정된 Task가 `.userInitiated` Task를 기다리고 있을 때 발생하는 현상은?",
+      "Swift Concurrency에서 `.userInitiated` Task가 `.background` 우선순위 actor/Task의 완료를 await하고 있을 때 런타임이 수행하는 동작은?",
     choices: [
       {
         id: "a",
-        text: "런타임이 priority escalation을 통해 대기 중인 작업의 우선순위를 임시로 끌어올린다.",
+        text: "런타임이 점유 중(낮은 우선순위)인 작업의 우선순위를 호출자(높은 우선순위)에 맞춰 임시로 승격(priority escalation)시킨다.",
       },
       {
         id: "b",
-        text: "background Task는 userInitiated Task가 완료될 때까지 영원히 대기하며 우선순위 변화는 없다.",
+        text: "대기 중인 userInitiated Task의 우선순위를 background로 떨어뜨려 맞춘다.",
       },
       {
         id: "c",
@@ -465,7 +465,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "a",
     explanation:
-      "Swift Concurrency 런타임은 Priority Inversion을 완화하기 위해 높은 우선순위 작업이 낮은 우선순위 actor/Task를 기다릴 때, 현재 점유자의 우선순위를 임시로 끌어올리는 priority escalation을 수행합니다.",
+      "Priority inversion은 높은 우선순위 작업이 낮은 우선순위 작업의 완료를 기다릴 때 발생한다. Swift Concurrency 런타임은 *기다림의 대상이 된 낮은 우선순위 작업*을 호출자 우선순위에 맞춰 임시로 승격(escalation)시켜 역전을 완화한다. waiter(높은 쪽)를 끌어내리는 게 아니라 점유자(낮은 쪽)를 끌어올리는 방향이라는 점이 핵심.",
     relatedTopicSlugs: ["03-concurrency/concurrency-runtime"],
   },
 

@@ -680,14 +680,14 @@ export const questions: RawExamQuestion[] = [
     prompt:
       "인증 미들웨어에서 401 재시도의 무한 루프를 방지하는 방법은?",
     choices: [
-      { id: "a", text: "최초 요청에 `X-Retried` 마커 헤더를 심어두고, 재시도 전 이 헤더가 이미 있는지 확인해 있으면 즉시 에러를 throw한다." },
+      { id: "a", text: "요청 wrapper에 클라이언트 측 `retryCount` 프로퍼티를 두고 재시도 직전 증가시켜 임계값 초과 시 즉시 에러를 throw한다." },
       { id: "b", text: "재시도 횟수를 서버에 쿼리 파라미터로 전달해 서버가 4회 이상 반환을 거부하도록 한다." },
       { id: "c", text: "`while true` 루프 대신 `Task.sleep`을 3회 반복한 뒤 자동 종료되도록 구현한다." },
       { id: "d", text: "URLSession의 `maximumConnectionsPerHost`를 1로 제한하면 동시 401이 발생하지 않는다." },
     ],
     correctChoiceId: "a",
     explanation:
-      "재시도 전 요청에 `X-Retried` 마커 헤더가 이미 있으면 이 요청은 이미 한 번 재시도된 것이므로 추가 재시도 없이 에러를 throw한다. Alamofire는 `Request.retryCount`로 동일하게 관리한다.",
+      "재시도 메타데이터는 *클라이언트 측 요청 wrapper*에 보관하는 것이 정석이다. 헤더로 서버에 노출하면 불필요한 정보가 새고, 멱등성 키와 혼동되며, 중간 프록시·로그에 마커가 박힌다. Alamofire의 `Request.retryCount`도 클라이언트 내부 상태로만 관리한다.",
     relatedTopicSlugs: ["07-networking/request-interceptor"],
   },
   {

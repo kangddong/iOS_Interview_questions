@@ -14,7 +14,7 @@ export const questions: RawExamQuestion[] = [
     prompt:
       "SwiftUI의 `Layout` 프로토콜(iOS 16+)에서 반드시 구현해야 하는 두 메서드는 무엇인가?",
     choices: [
-      { id: "a", text: "sizeThatFits(_:subviews:cache:)와 placeSubviews(in:proposal:subviews:cache:)" },
+      { id: "a", text: "sizeThatFits(proposal:subviews:cache:)와 placeSubviews(in:proposal:subviews:cache:)" },
       { id: "b", text: "layoutSize(for:)와 layoutChildren(_:)" },
       { id: "c", text: "preferredSize(for:)와 arrange(in:)" },
       { id: "d", text: "measureContent(_:)와 commitLayout(_:)" },
@@ -388,7 +388,7 @@ export const questions: RawExamQuestion[] = [
     level: "advanced",
     category: "SwiftUI",
     prompt:
-      "자주 변경되는 작은 `@State`를 부모 View에 두는 것보다 자식 View로 내리는(State Hoisting 역방향) 것이 유리한 이유는?",
+      "자주 변경되는 작은 `@State`를 부모 View가 아닌 자식 View로 옮기는(state colocation, \"push state down\") 것이 유리한 이유는?",
     choices: [
       { id: "a", text: "자식 View는 부모의 @State에 접근할 수 없기 때문이다." },
       { id: "b", text: "자식이 직접 state를 가지면 그 자식의 body만 재호출되어 부모와 형제 View의 불필요한 재계산이 줄어든다." },
@@ -397,7 +397,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "부모 View에 자주 변경되는 state가 있으면 부모 body가 재호출될 때 비용이 큰 형제 View(예: ExpensiveList)도 함께 평가된다. 해당 state를 자식으로 내리면 그 자식 body만 재호출되어 전체 트리의 불필요한 재계산이 줄어든다.",
+      "부모 View에 자주 변경되는 state가 있으면 부모 body가 재호출될 때 비용이 큰 형제 View(예: ExpensiveList)도 함께 평가된다. 해당 state를 자식으로 내리는 *state colocation* (\"push state down\") 패턴을 쓰면 그 자식 body만 재호출되어 전체 트리의 불필요한 재계산이 줄어든다.",
     relatedTopicSlugs: ["05-swiftui/performance"],
   },
 

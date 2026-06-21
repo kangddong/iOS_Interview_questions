@@ -259,7 +259,7 @@ export const questions: RawExamQuestion[] = [
       },
       {
         id: "b",
-        text: "body가 호출될 때마다 정렬 연산이 반복 실행되므로, 정렬된 결과를 @Observable store에 캐시하고 body에서는 읽기만 해야 한다",
+        text: "body가 호출될 때마다 정렬 연산이 반복 실행되므로, 정렬된 결과를 ViewModel/`@Observable`(iOS 17+, Swift 5.9+) store에 캐시하고 body에서는 읽기만 해야 한다",
       },
       {
         id: "c",
@@ -330,7 +330,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "c",
     explanation:
-      "`0x8badf00d`는 'ate bad food'를 숫자로 표현한 것으로, 앱이 시작(또는 포그라운드 복귀) 시간 제한 내에 응답하지 못해 watchdog에 의해 강제 종료된 경우입니다. `0xbaaaaaad`는 메인 스레드 응답 없음, `0xdeadfa11`은 사용자 Force Quit, `SIGABRT`는 `fatalError`/`assert` 실패입니다.",
+      "`0x8badf00d`는 'ate bad food'를 숫자로 표현한 것으로, 앱이 시작·포그라운드·백그라운드 전환 등에서 메인 스레드가 시간 제한 내에 응답하지 못해 watchdog에 의해 강제 종료된 경우입니다. **`0xbaaaaaad`는 크래시 코드가 아니라 시스템 stackshot 마커**(시스템 전체 스냅샷용)이므로 크래시 분류 시 혼동하면 안 됩니다. `0xdeadfa11`은 사용자 Force Quit, `SIGABRT`는 `fatalError`/`assert` 실패입니다.",
     relatedTopicSlugs: ["10-performance/metrickit-and-crash"],
   },
   {

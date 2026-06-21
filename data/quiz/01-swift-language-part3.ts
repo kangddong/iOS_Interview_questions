@@ -147,7 +147,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "`any P`의 내부 inline buffer(약 4 word/32바이트)를 값이 초과하면 heap 박스를 별도 할당하고 포인터만 inline buffer에 넣는다. 이때 추가 heap 할당 비용과 ARC retain/release 비용이 발생한다.",
+      "`any P`의 내부 inline buffer(3 word/24바이트)를 값이 초과하면 heap 박스를 별도 할당하고 포인터만 inline buffer에 넣는다. 이때 추가 heap 할당 비용과 ARC retain/release 비용이 발생한다.",
     relatedTopicSlugs: ["01-swift-language/some-vs-any"],
   },
 
@@ -419,13 +419,13 @@ export const questions: RawExamQuestion[] = [
       "`Any` 변수에 `nil`을 담을 때 발생하는 주의할 점은?",
     choices: [
       { id: "a", text: "컴파일 에러가 발생해서 담을 수 없다" },
-      { id: "b", text: "Any에 nil을 담으면 옵셔널 박싱이 두 번 일어나는 함정이 있다" },
+      { id: "b", text: "Optional이 Any에 wrap되면 `x == nil` 검사가 실패해 `Optional<Any>.none` 패턴으로 분기해야 한다" },
       { id: "c", text: "Any는 nil을 일반 값과 동일하게 처리해 함정이 없다" },
       { id: "d", text: "nil을 Any에 담으면 자동으로 0으로 변환된다" },
     ],
     correctChoiceId: "b",
     explanation:
-      "`Any`에 nil을 담으면 `Optional<Any>.some(nil)` 같은 이중 박싱이 발생할 수 있다. `if case Optional<Any>.none = x` 또는 `x as? Optional<Any> == .some(nil)` 패턴으로 검사해야 하는 함정이 존재한다.",
+      "`nil` 리터럴은 Any에 직접 대입할 수 없고, 옵셔널 변수를 거쳐 `Any`로 들어간다. 이때 값은 `Any.some(Optional.none)` 형태가 되어 `x == nil` 비교가 false이고, `x as? T` 캐스팅도 nil 검출에 실패한다. 정확히 잡으려면 `if case Optional<Any>.none = x` 패턴으로 분기해야 한다.",
     relatedTopicSlugs: ["01-swift-language/type-casting"],
   },
 

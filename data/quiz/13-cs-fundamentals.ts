@@ -224,7 +224,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "NSLock는 런타임에 잠금/해제를 잊으면 데이터 레이스나 데드락이 발생합니다. 반면 Swift actor는 컴파일 타임에 격리 위반을 검출하여 데이터 레이스 자체를 원천 차단합니다. actor hop 비용이 있어 항상 빠르지는 않지만, 안전성 관점에서 신규 코드의 기본 선택입니다. iOS 5.5+(Swift 5.5+) 이상 환경에서 사용 가능합니다.",
+      "NSLock는 런타임에 잠금/해제를 잊으면 데이터 레이스나 데드락이 발생합니다. 반면 Swift actor는 컴파일 타임에 격리 위반을 검출하여 데이터 레이스 자체를 원천 차단합니다. actor hop 비용이 있어 항상 빠르지는 않지만, 안전성 관점에서 신규 코드의 기본 선택입니다. Swift 5.5+ / iOS 13+ 환경에서 사용 가능합니다(언어 기능은 Swift 5.5에서 도입됐고 concurrency 런타임이 iOS 13까지 back-deploy됩니다).",
     relatedTopicSlugs: ["13-cs-fundamentals/concurrency-primitives"],
   },
 
@@ -274,13 +274,13 @@ export const questions: RawExamQuestion[] = [
       "LRU(Least Recently Used) 캐시를 O(1) 접근과 O(1) 삭제로 구현하기 위해 필요한 자료구조 조합은?",
     choices: [
       { id: "a", text: "Array + Set" },
-      { id: "b", text: "LinkedList + HashMap" },
+      { id: "b", text: "Doubly Linked List + HashMap" },
       { id: "c", text: "Binary Heap + Array" },
       { id: "d", text: "Trie + Queue" },
     ],
     correctChoiceId: "b",
     explanation:
-      "LRU 캐시는 LinkedList로 접근 순서를 추적(가장 최근 사용은 head, 가장 오래된 것은 tail)하고, HashMap으로 key→노드 O(1) 조회를 제공합니다. 접근 시 노드를 head로 이동하고, 용량 초과 시 tail을 O(1)에 제거합니다. 두 자료구조를 동기화하여 모든 연산을 O(1)로 유지합니다.",
+      "LRU 캐시는 **Doubly Linked List**로 접근 순서를 추적(가장 최근 사용은 head, 가장 오래된 것은 tail)하고, HashMap으로 key→노드 O(1) 조회를 제공합니다. *단일 연결 리스트*로는 중간 노드 제거 시 이전 노드 포인터를 알 수 없어 O(n)이 되므로, prev 포인터를 가진 doubly linked list여야 임의 노드를 O(1)에 제거할 수 있습니다. 접근 시 노드를 head로 이동하고, 용량 초과 시 tail을 O(1)에 제거합니다.",
     relatedTopicSlugs: ["13-cs-fundamentals/data-structures"],
   },
   {

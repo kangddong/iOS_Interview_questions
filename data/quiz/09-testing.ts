@@ -50,17 +50,17 @@ export const questions: RawExamQuestion[] = [
     prompt:
       "swift-snapshot-testing에서 첫 번째 테스트 실행 시 어떤 일이 일어나는가?",
     choices: [
-      { id: "a", text: "테스트가 즉시 실패하고 기준 이미지 생성을 요청한다" },
+      { id: "a", text: "Xcode가 자동으로 기준 이미지를 네트워크에서 다운로드한다" },
       {
         id: "b",
-        text: "현재 결과 이미지를 디스크(__Snapshots__/)에 저장하고 통과한다",
+        text: "현재 결과 이미지를 디스크(__Snapshots__/)에 저장하고 \"No reference was found... Automatically recorded snapshot\" 메시지와 함께 테스트를 실패로 표시한다",
       },
       { id: "c", text: "이미지를 메모리에만 유지하고 다음 실행 시 비교한다" },
-      { id: "d", text: "Xcode가 자동으로 기준 이미지를 네트워크에서 다운로드한다" },
+      { id: "d", text: "테스트가 통과하지만 CI에서는 자동으로 실패한다" },
     ],
     correctChoiceId: "b",
     explanation:
-      "swift-snapshot-testing은 기준 이미지가 없을 때 첫 실행에서 현재 렌더링 결과를 __Snapshots__/ 디렉토리에 저장하고 테스트를 통과시킵니다. 이후 실행부터는 저장된 이미지와 바이트 비교를 수행하며, 이 기준 파일을 git에 commit해야 CI에서도 비교가 가능합니다.",
+      "swift-snapshot-testing은 기준 이미지가 없을 때 첫 실행에서 현재 렌더링 결과를 __Snapshots__/ 디렉토리에 저장하면서 동시에 *테스트를 실패*로 표시합니다. 이는 의도적 동작으로, 개발자가 기록된 스냅샷을 시각적으로 확인한 뒤 git에 commit하도록 유도합니다. 이후 실행부터는 저장된 이미지와 바이트 비교를 수행합니다. `isRecording = true`로 명시적 재기록 모드도 지원합니다.",
     relatedTopicSlugs: ["09-testing/snapshot-and-ui-testing"],
   },
   {
@@ -179,7 +179,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "Swift Testing에서는 struct로 테스트를 묶고 init()에서 SUT를 초기화합니다. 각 @Test 함수 실행 시 struct의 새 인스턴스가 생성되므로 자연스럽게 테스트 격리가 보장됩니다. struct deinit이 tearDown 역할을 합니다. XCTestCase 상속은 Swift Testing이 아닌 XCTest 방식입니다.",
+      "Swift Testing에서는 struct로 테스트를 묶고 init()에서 SUT를 초기화합니다. 각 @Test 함수 실행 시 struct의 새 인스턴스가 생성되므로 자연스럽게 테스트 격리가 보장됩니다. **struct에는 deinit이 없으므로** tearDown이 꼭 필요하다면 suite를 `final class`로 바꿔 `deinit`을 활용하거나, RAII helper(예: `defer` 또는 disposable wrapper)를 두면 됩니다. XCTestCase 상속은 Swift Testing이 아닌 XCTest 방식입니다.",
     relatedTopicSlugs: ["09-testing/swift-testing"],
   },
   {

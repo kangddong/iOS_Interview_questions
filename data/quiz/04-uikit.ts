@@ -174,7 +174,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "a",
     explanation:
-      "제약 상수를 변경한 뒤, UIView.animate 블록 *안*에서 view.layoutIfNeeded()를 호출해야 변경이 애니메이션으로 보간된다. frame을 직접 수정하거나 layoutIfNeeded를 animate 블록 밖에서 호출하면 애니메이션이 적용되지 않는다.",
+      "Auto Layout은 update constraints → layout → display의 3단계 패스로 돌며, 각 패스는 트리거 메서드로 \"예약\"만 한다. 제약 상수만 바꾸면 변경이 다음 주기에 한 번에 튀므로, UIView.animate 블록 *안*에서 layoutIfNeeded()를 호출해 layout 패스를 즉시 실행시켜야 frame 변화가 보간된다. frame을 직접 수정하면 다음 layout 패스에서 제약대로 되돌아가며 snap back된다.",
     relatedTopicSlugs: ["04-uikit/auto-layout"],
   },
   {
@@ -376,7 +376,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "a",
     explanation:
-      "transform이 적용되면 frame은 변환된 뷰를 감싸는 직사각형(바운딩 박스)으로 변경되어 크기/위치가 달라진다. 반면 bounds와 center는 transform과 독립적으로 유지된다. transform이 적용된 뷰의 frame을 직접 set하면 transform이 깨질 수 있으므로, bounds + center 조합으로 위치와 크기를 다뤄야 한다.",
+      "transform이 적용되면 frame은 변환된 뷰를 감싸는 직사각형(바운딩 박스)으로 변경되어 크기/위치가 달라진다. 반면 bounds와 center는 transform과 독립적으로 유지된다. **transform이 identity가 아닐 때 frame 값은 \"정의되지 않음(undefined)\"** 으로 Apple 문서에 명시되어 있으므로 읽거나 쓰지 말고, bounds + center 조합으로 위치와 크기를 다뤄야 한다.",
     relatedTopicSlugs: ["04-uikit/frame-vs-bounds"],
   },
 
@@ -557,7 +557,7 @@ export const questions: RawExamQuestion[] = [
     level: "intermediate",
     category: "UIKit",
     prompt:
-      "iOS 렌더링 파이프라인에서 Render Server(backboardd)의 역할은?",
+      "iOS 렌더링 파이프라인에서 Render Server(앱 프로세스와 분리된 시스템 데몬)의 역할은?",
     choices: [
       {
         id: "a",
@@ -578,7 +578,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "Render Server(backboardd)는 앱 프로세스와 분리된 별도 프로세스이다. 메인 스레드가 CATransaction.commit()으로 layer 트리의 변경을 전송하면, Render Server가 이를 받아 GPU 명령으로 변환하고, 그림자/마스크/블러 같은 off-screen pass를 처리한 뒤 최종적으로 GPU에 제출한다.",
+      "Render Server는 앱 프로세스와 분리된 별도 시스템 프로세스이다(역사적으로 `backboardd`와 혼용되기도 하지만 같은 프로세스가 아니다). 메인 스레드가 CATransaction.commit()으로 layer 트리의 변경을 전송하면, Render Server가 이를 받아 GPU 명령으로 변환하고, 그림자/마스크/블러 같은 off-screen pass를 처리한 뒤 최종적으로 GPU에 제출한다.",
     relatedTopicSlugs: ["04-uikit/rendering-pipeline"],
   },
   {
@@ -633,7 +633,7 @@ export const questions: RawExamQuestion[] = [
       },
       {
         id: "d",
-        text: "큰 단순 배경 위에 복잡한 콘텐츠를 올리는 패턴은 TBDR에서 불리하다.",
+        text: "TBDR은 over-draw에 영향을 받지 않으므로 알파 블렌딩 비용이 항상 0이다.",
       },
     ],
     correctChoiceId: "b",
@@ -670,7 +670,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "터치 이벤트 처리는 두 단계로 나뉜다. 먼저 Hit-Testing 단계에서 hitTest(_:with:)를 재귀적으로 호출해 터치 좌표가 어느 뷰인지 결정한다. 그 뷰를 first responder로 삼아 Responder Chain을 따라 이벤트를 처리할 수 있는 responder를 찾아 올라간다.",
+      "터치 이벤트 처리는 두 단계로 나뉜다. 먼저 Hit-Testing 단계에서 hitTest(_:with:)를 재귀적으로 호출해 터치 좌표가 어느 뷰인지 결정한다. 그 뷰를 first responder로 삼아 Responder Chain을 따라 이벤트를 처리할 수 있는 responder를 찾아 올라간다. 체인은 view → 상위 view → ViewController → window → UIApplication → AppDelegate(UIResponder 서브클래스) 순으로 거슬러 올라가며, 어디서도 처리하지 않으면 이벤트는 폐기된다.",
     relatedTopicSlugs: ["04-uikit/responder-chain"],
   },
   {
@@ -768,7 +768,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "UIKit은 스크롤·터치 추적 중에 RunLoop 모드를 .default에서 .tracking(UITrackingRunLoopMode)으로 전환한다. .default 모드로만 등록된 타이머는 이 모드에서 실행되지 않는다. 해결책은 RunLoop.current.add(timer, forMode: .common)으로 등록하는 것이다. .common은 .default와 .tracking을 모두 포함한다.",
+      "UIKit은 스크롤·터치 추적 중에 RunLoop 모드를 .default에서 .tracking(UITrackingRunLoopMode)으로 전환한다. .default 모드로만 등록된 타이머는 이 모드에서 실행되지 않는다. 해결책은 RunLoop.current.add(timer, forMode: .common)으로 등록하는 것이다. 엄밀히 `.common`은 모드가 아니라 *common modes 집합에 등록된 모든 모드*(기본적으로 default와 tracking을 포함)에서 소스가 발화되도록 만드는 키이다.",
     relatedTopicSlugs: ["04-uikit/runloop-deep"],
   },
   {
@@ -936,7 +936,7 @@ export const questions: RawExamQuestion[] = [
       },
       {
         id: "b",
-        text: "viewDidLoad 시점에는 뷰가 부모에 추가되지 않아 실제 디바이스 크기가 아닌 storyboard 기준값이거나 .zero일 수 있다. viewDidLayoutSubviews 또는 iOS 17+ viewIsAppearing에서 설정해야 한다.",
+        text: "viewDidLoad 시점에는 뷰가 부모에 추가되지 않아 실제 디바이스 크기가 아닌 storyboard 기준값이거나 .zero일 수 있다. viewDidLayoutSubviews 또는 viewIsAppearing(iOS 17 SDK, iOS 13까지 back-deploy)에서 설정해야 한다.",
       },
       {
         id: "c",
@@ -949,7 +949,7 @@ export const questions: RawExamQuestion[] = [
     ],
     correctChoiceId: "b",
     explanation:
-      "viewDidLoad 시점에는 뷰가 메모리에 적재됐을 뿐 아직 부모 뷰에 추가되지 않았다. 따라서 view.bounds는 storyboard 기준값이거나 잘못된 크기일 수 있다. 실제 디바이스 화면 크기를 반영한 정확한 frame이 필요하다면 viewDidLayoutSubviews(iOS 16 이하) 또는 iOS 17+ viewIsAppearing에서 설정해야 한다.",
+      "viewDidLoad 시점에는 뷰가 메모리에 적재됐을 뿐 아직 부모 뷰에 추가되지 않았다. 따라서 view.bounds는 storyboard 기준값이거나 잘못된 크기일 수 있다. 실제 디바이스 화면 크기를 반영한 정확한 frame이 필요하다면 viewDidLayoutSubviews 또는 viewIsAppearing(iOS 17 SDK로 도입됐고 iOS 13까지 back-deploy되므로 배포 타깃이 iOS 13 이상이면 Xcode 15+에서 사용 가능)에서 설정해야 한다.",
     relatedTopicSlugs: ["04-uikit/viewcontroller-lifecycle"],
   },
   {
