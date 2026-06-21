@@ -79,7 +79,7 @@ queue.addOperations([download, parse, display], waitUntilFinished: false)
   KVO 기반 상태 머신이라 코드량이 많았다.
 - WWDC 2015 "Advanced NSOperations"는 ObjC 시대의 정점 — depencency-driven UI workflow.
 - 현대 Swift에선 async/await + TaskGroup이 거의 대체.
-- 더 깊게: [17-objective-c/kvo-kvc](../../17-objective-c/kvo-kvc.md)
+- 더 깊게: [17-objective-c/kvo-kvc](../17-objective-c/kvo-kvc.md)
 
 ## 참고
 
