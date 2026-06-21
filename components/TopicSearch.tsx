@@ -20,15 +20,25 @@ const LEVEL_TABS: Array<{ id: LevelTab; label: string; hint: string }> = [
   { id: "advanced",     label: "시니어", hint: "ABI / 런타임 / 시스템 디자인" }
 ];
 
+const ROADMAP_CATEGORY_ID = "00-overview";
+
 export function TopicSearch({ topics, categories, topicLevels }: TopicSearchProps) {
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [levelTab, setLevelTab] = useState<LevelTab>("all");
 
+  const visibleCategories = useMemo(
+    () => [...categories].sort((a, b) => a.order - b.order),
+    [categories]
+  );
+
   const filteredTopics = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return topics.filter((topic) => {
+      if (categoryId === "all" && topic.categoryId === ROADMAP_CATEGORY_ID) {
+        return false;
+      }
       const matchesCategory = categoryId === "all" || topic.categoryId === categoryId;
       const haystack = `${topic.title} ${topic.summary} ${topic.excerpt} ${topic.categoryTitle}`.toLowerCase();
       const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
@@ -39,35 +49,30 @@ export function TopicSearch({ topics, categories, topicLevels }: TopicSearchProp
     });
   }, [categoryId, levelTab, query, topicLevels, topics]);
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, Topic[]>();
-    for (const topic of filteredTopics) {
-      const list = map.get(topic.categoryId) ?? [];
-      list.push(topic);
-      map.set(topic.categoryId, list);
-    }
-    return [...categories]
-      .sort((a, b) => a.order - b.order)
-      .map((category) => ({
-        category,
-        items: map.get(category.id) ?? []
-      }))
-      .filter((entry) => entry.items.length > 0);
-  }, [categories, filteredTopics]);
-
   const countByLevel = useMemo(() => {
     const counts: Record<LevelTab, number> = {
-      all: topics.length,
+      all: 0,
       basic: 0,
       intermediate: 0,
       advanced: 0
     };
     for (const topic of topics) {
+      if (topic.categoryId === ROADMAP_CATEGORY_ID) continue;
+      counts.all += 1;
       const levels = topicLevels[topic.slug] ?? [];
       for (const lvl of levels) counts[lvl] += 1;
     }
     return counts;
   }, [topicLevels, topics]);
+
+  const countByCategory = useMemo(() => {
+    const counts: Record<string, number> = { all: 0 };
+    for (const topic of topics) {
+      if (topic.categoryId !== ROADMAP_CATEGORY_ID) counts.all += 1;
+      counts[topic.categoryId] = (counts[topic.categoryId] ?? 0) + 1;
+    }
+    return counts;
+  }, [topics]);
 
   return (
     <section className="tool-surface" aria-labelledby="topic-search-title">
@@ -95,6 +100,31 @@ export function TopicSearch({ topics, categories, topicLevels }: TopicSearchProp
         ))}
       </div>
 
+      <div className="category-chips" role="group" aria-label="카테고리 필터">
+        <button
+          type="button"
+          aria-pressed={categoryId === "all"}
+          className={categoryId === "all" ? "category-chip active" : "category-chip"}
+          onClick={() => setCategoryId("all")}
+        >
+          전체
+          <span className="category-chip-count">{countByCategory.all ?? 0}</span>
+        </button>
+        {visibleCategories.map((category) => (
+          <button
+            key={category.id}
+            type="button"
+            aria-pressed={categoryId === category.id}
+            className={categoryId === category.id ? "category-chip active" : "category-chip"}
+            onClick={() => setCategoryId(category.id)}
+            title={category.description}
+          >
+            {category.title}
+            <span className="category-chip-count">{countByCategory[category.id] ?? 0}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="search-row">
         <label className="search-field">
           <Search size={18} aria-hidden="true" />
@@ -105,51 +135,30 @@ export function TopicSearch({ topics, categories, topicLevels }: TopicSearchProp
             placeholder="옵셔널, actor, Auto Layout..."
           />
         </label>
-        <label className="select-field">
-          <span className="sr-only">카테고리 선택</span>
-          <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-            <option value="all">전체 카테고리</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.title}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
 
-      {grouped.length === 0 ? (
+      {filteredTopics.length === 0 ? (
         <p className="muted">조건에 맞는 문서가 없습니다.</p>
       ) : (
-        <div className="topic-category-blocks">
-          {grouped.map(({ category, items }) => (
-            <section key={category.id} className="topic-category-block">
-              <header className="topic-category-head">
-                <h2>{category.title}</h2>
-                <span className="muted small">{items.length}편</span>
-              </header>
-              <div className="card-grid topic-grid">
-                {items.map((topic) => {
-                  const levels = topicLevels[topic.slug] ?? [];
-                  return (
-                    <Link key={topic.slug} href={`/topics/${topic.slug}`} className="topic-card">
-                      <span className="card-meta">{topic.categoryTitle}</span>
-                      <h2>{topic.title}</h2>
-                      <p>{topic.excerpt}</p>
-                      <div className="topic-card-foot">
-                        <span className="read-time">{topic.readingMinutes}분 읽기</span>
-                        {levels.map((lvl) => (
-                          <span key={lvl} className={`level-chip level-${lvl}`}>
-                            {lvl === "basic" ? "주니어" : lvl === "intermediate" ? "미들" : "시니어"}
-                          </span>
-                        ))}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          ))}
+        <div className="card-grid topic-grid">
+          {filteredTopics.map((topic) => {
+            const levels = topicLevels[topic.slug] ?? [];
+            return (
+              <Link key={topic.slug} href={`/topics/${topic.slug}`} className="topic-card">
+                <span className="card-meta">{topic.categoryTitle}</span>
+                <h2>{topic.title}</h2>
+                <p>{topic.excerpt}</p>
+                <div className="topic-card-foot">
+                  <span className="read-time">{topic.readingMinutes}분 읽기</span>
+                  {levels.map((lvl) => (
+                    <span key={lvl} className={`level-chip level-${lvl}`}>
+                      {lvl === "basic" ? "주니어" : lvl === "intermediate" ? "미들" : "시니어"}
+                    </span>
+                  ))}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </section>
