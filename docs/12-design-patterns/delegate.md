@@ -137,7 +137,7 @@ Delegate 패턴 자체가 ObjC Cocoa의 핵심 패턴 — Swift는 그대로 가
 - ObjC에서 protocol에 `<NSObject>` 상속이 관례인 이유: `respondsToSelector:` 같은 NSObject 메서드를 호출하기 위해.
 - ObjC delegate `weak` 사용은 Swift와 동일 — retain cycle 방지.
 - UIKit `UITableViewDelegate` 같은 큰 protocol은 Swift로 와도 형태가 거의 동일.
-- 더 깊게: [17-objective-c/protocols](../../17-objective-c/protocols.md)
+- 더 깊게: [17-objective-c/protocols](../17-objective-c/protocols.md)
 
 ## 참고
 

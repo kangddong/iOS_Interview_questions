@@ -175,7 +175,7 @@ static void *kStatusCtx = &kStatusCtx;
 - ObjC 시절 KVO는 string keypath라 오타에 약했다. Swift `\.status` KeyPath로 타입 안전 ↑.
 - Swift에서 KVO를 쓰려면 `NSObject` 상속 + `@objc dynamic` 필수 — ObjC 런타임 의존성이 그대로 노출된다.
 - ObjC 시절엔 Combine/AsyncSequence가 없어서 *값 흐름*을 표현하려면 KVO + NotificationCenter + manual callback property 조합으로 직접 짜야 했음.
-- 더 깊게: [17-objective-c/kvo-kvc](../../17-objective-c/kvo-kvc.md) (isa-swizzling 메커니즘)
+- 더 깊게: [17-objective-c/kvo-kvc](../17-objective-c/kvo-kvc.md) (isa-swizzling 메커니즘)
 
 ## 참고
 

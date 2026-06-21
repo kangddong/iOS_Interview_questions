@@ -113,7 +113,7 @@ override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
   현재 first responder부터 chain을 따라가며 `respondsToSelector:@selector(copy:)`인 객체에 메시지를 보낸다. (`UIMenuController`/`UIEditMenuInteraction`의 copy/paste 메커니즘)
 - `hitTest:withEvent:` / `pointInside:withEvent:`도 ObjC 시절 시그니처 그대로. Swift에선 `hitTest(_:with:)`로 이름만 변환.
 - ObjC `UIResponder`의 인터페이스는 `<UIResponderStandardEditActions>` protocol에서 `cut:`/`copy:`/`paste:` 같은 표준 selector들을 정의.
-- 더 깊게: [17-objective-c/method-dispatch](../../17-objective-c/method-dispatch.md) (responder chain은 결국 selector lookup의 응용)
+- 더 깊게: [17-objective-c/method-dispatch](../17-objective-c/method-dispatch.md) (responder chain은 결국 selector lookup의 응용)
 
 ## 참고
 

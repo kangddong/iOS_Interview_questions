@@ -130,7 +130,7 @@ DispatchQueue.global(qos: .userInitiated).async {
 - ObjC block의 `__weak self` / `__strong strongSelf` 패턴 = Swift `[weak self]` + `guard let self`.
 - ObjC 시절에는 GCD가 사실상 *유일한 권장 동시성 API*였고, NSOperation은 객체 지향 wrapper로 등장.
 - Swift 5.5+의 async/await가 등장하기 전까지 모든 비동기 코드는 GCD callback 형태였다.
-- 더 깊게: [17-objective-c/blocks](../../17-objective-c/blocks.md) (block과 GCD)
+- 더 깊게: [17-objective-c/blocks](../17-objective-c/blocks.md) (block과 GCD)
 
 ## 참고
 
