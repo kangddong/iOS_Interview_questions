@@ -77,6 +77,30 @@ child.didMove(toParent: self)
 
 `didMove(toParent:)`/`willMove(toParent:)`를 빼먹으면 자식 VC의 appearance 콜백이 깨진다.
 
+## UIView 계층 이동 콜백 — didMoveToWindow가 핵심
+
+VC 콜백과는 별개로 **UIView 자체에도 계층 이동 콜백**이 있다. 실무에서 가장 자주 쓰이는 건 윈도우 관련 콜백.
+
+| 콜백 | 의미 |
+|---|---|
+| `willMove(toSuperview:)` / `didMoveToSuperview()` | 슈퍼뷰에 추가·제거. `didMoveToSuperview`에서 인자(=구 superview)가 `nil`이 아니면 *추가된 것* |
+| `willMove(toWindow:)` / `didMoveToWindow()` | 뷰가 실제 **윈도우(화면)** 에 올라오거나 내려갈 때 |
+
+뷰가 계층에 있다고 해서 화면에 보이는 건 아니다. **윈도우에 붙어야 진짜 보인다.** 그래서 "화면에 실제로 보일 때만 시작해야 하는 작업" — 반복 애니메이션, 타이머, 디스플레이 링크 — 은 `didMoveToWindow()`에서 `window != nil` 확인하고 시작/중지하는 게 정석.
+
+```swift
+override func didMoveToWindow() {
+    super.didMoveToWindow()
+    if window != nil {
+        startPulseAnimation()       // 화면에 올라옴
+    } else {
+        stopPulseAnimation()        // 화면에서 내려감 → 메모리/배터리 절약
+    }
+}
+```
+
+`viewDidLoad`/`init`에서 애니메이션을 시작하면 안 되는 이유가 여기 있다. 그 시점엔 아직 윈도우에 없고 frame도 확정 전.
+
 ## init? vs loadView vs viewDidLoad
 
 | 시점 | 뷰 상태 |
@@ -103,6 +127,12 @@ child.didMove(toParent: self)
 
 - **Q. memory warning 시 `viewWillUnload`?**
   iOS 6에서 deprecate. 지금은 OS가 자동으로 보이지 않는 VC의 view를 해제. `didReceiveMemoryWarning`만 남음.
+
+- **Q. 반복 애니메이션 / 타이머는 어디서 시작?**
+  `didMoveToWindow()`에서 `window != nil` 확인 후 시작. `nil`이면 중지. `viewDidLoad`나 `init`은 아직 화면에 없는 시점이라 부적절. → [Auto Layout 사이클 ↔ 화면 등장](auto-layout.md#layout-사이클--3단계-패스)
+
+- **Q. `viewDidLoad`에서 `view.bounds`로 그라디언트 frame을 잡았는데 크기가 이상하다?**
+  `viewDidLoad`의 bounds는 storyboard/이전 화면 기준. 첫 레이아웃 패스 이후의 값이 아니다. `viewDidLayoutSubviews`(또는 커스텀 뷰면 `layoutSubviews`)에서 잡아라. CALayer는 Auto Layout을 안 타므로 frame 수동 갱신은 거기서. → [Auto Layout — CALayer는 Auto Layout을 안 탄다](auto-layout.md#calayer는-auto-layout을-안-탄다)
 
 ## 참고
 
