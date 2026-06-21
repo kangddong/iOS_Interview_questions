@@ -913,4 +913,40 @@ export const questions: RawExamQuestion[] = [
       "weak 참조는 대상 객체가 해제될 때 런타임이 자동으로 nil로 갱신(zeroing)한다. 이 nil 신호를 담으려면 Optional 타입이 반드시 필요하다. 비옵셔널이었다면 해제된 메모리를 가리키는 dangling pointer가 되어 안전하지 않다.",
     relatedTopicSlugs: ["02-memory-management/weak-vs-unowned"],
   },
+
+  // ─── weak-vs-unowned-deep + cycle (add: 2) ───────────────────────────────
+  {
+    id: "objective-c02-intermediate-weak-vs-unowned-direct-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Memory",
+    prompt: "`weak`과 `unowned`를 *비용·안전성·수명 가정* 관점에서 비교한 것으로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "weak: Optional + side table 등록 → 약간의 비용, deinit 시 자동 nil. unowned: 추가 비용 거의 0, 대상이 먼저 사라지면 dangling → 접근 시 crash. 수명이 확실히 상위인 관계엔 unowned, 불확실하면 weak." },
+      { id: "b", text: "weak이 unowned보다 항상 빠르고 안전하므로 weak만 쓰면 된다" },
+      { id: "c", text: "둘 다 자동 nil 처리이지만 unowned는 Optional이 아니다" },
+      { id: "d", text: "weak는 컴파일 타임에만 동작하고 unowned는 런타임에 동작한다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "weak는 deinit 시 자동 nil 보정을 위해 객체의 *side table*에 등록되고, 접근 시 atomic 검사 비용이 약간 든다. unowned는 별도 추적 없이 raw pointer처럼 동작해 비용이 거의 0이지만, 대상이 먼저 해제되면 dangling이 되어 접근 시 trap이 발생한다. 따라서 \"내가 가리키는 대상의 수명이 항상 나보다 길다\"는 *수명 가정*이 확실할 때만 unowned, 불확실하면 weak를 쓰는 것이 정석.",
+    relatedTopicSlugs: ["02-memory-management/weak-vs-unowned"],
+  },
+  {
+    id: "objective-c02-basic-retain-cycle-class-class-001",
+    type: "objective",
+    level: "basic",
+    category: "Memory",
+    prompt: "Parent 클래스가 Child를 강참조하고 Child가 자신의 `parent` 프로퍼티로 Parent를 강참조한다. 해제되지 않는 이 상황을 가장 안전하게 끊는 방법은?",
+    choices: [
+      { id: "a", text: "Child.parent를 `weak`로 선언한다" },
+      { id: "b", text: "Parent.child를 `weak`로 선언한다" },
+      { id: "c", text: "Parent.deinit에서 child를 nil로 직접 끊는다 — ARC가 강참조를 풀어준다" },
+      { id: "d", text: "Child를 struct로 바꾼다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "전형적인 부모↔자식 양방향 강참조 사이클이다. 소유 관계(parent → child)는 보통 강참조로 두고, 역방향(child → parent)은 `weak`로 만들어 끊는 것이 표준이다. Parent.child를 weak로 하면 자식이 부모보다 먼저 해제되어 의도가 깨진다. Parent.deinit은 사이클이 있으면 *애초에 호출되지 않으므로* 의존하면 안 된다. Child를 struct로 바꾸는 건 도메인 의미가 다를 때만 가능한 선택.",
+    relatedTopicSlugs: ["02-memory-management/retain-cycle", "02-memory-management/weak-vs-unowned"],
+  },
 ];

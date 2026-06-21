@@ -982,4 +982,57 @@ export const questions: RawExamQuestion[] = [
       ".overFullScreen이나 .overCurrentContext 같은 모달 방식은 하단의 뷰 컨트롤러(A)를 시각적으로 보존하기 때문에 A의 viewWillDisappear/viewDidDisappear가 호출되지 않는다. 반면 full screen 모달이나 push는 A가 화면에서 완전히 사라지므로 disappear 콜백이 호출된다. 이 차이를 인지하지 못하면 disappear 시점에 의존하는 로직(타이머 중지, 리소스 해제 등)이 예상대로 동작하지 않을 수 있다.",
     relatedTopicSlugs: ["04-uikit/viewcontroller-lifecycle"],
   },
+
+  // ─── auto-layout-deepdive (add: 3) ───────────────────────────────────────
+  {
+    id: "objective-c04-advanced-transform-and-autolayout-001",
+    type: "objective",
+    level: "advanced",
+    category: "UIKit",
+    prompt: "Auto Layout이 켜진 뷰에 `transform = CGAffineTransform(scaleX: 1.2, y: 1.2)`을 적용한 뒤 레이아웃 패스가 한 번 더 돌면 어떤 일이 일어나는가?",
+    choices: [
+      { id: "a", text: "다음 레이아웃 패스에서 transform이 identity로 초기화된다" },
+      { id: "b", text: "center와 bounds는 제약대로 다시 결정되고, transform은 그대로 유지되어 그 위에 합성된다" },
+      { id: "c", text: "transform이 frame을 덮어써 제약이 무시된다" },
+      { id: "d", text: "Auto Layout 시스템이 자동으로 transform을 분해해 별도 제약으로 등록한다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "Auto Layout은 뷰의 *center와 bounds(정렬 사각형)* 만 제어한다. `transform`은 그 결과 위에 별도로 합성되는 시각 변환이라 레이아웃 패스가 다시 돌아도 초기화되지 않는다. 그래서 일시적 효과(버튼 눌림, 흔들기)는 transform으로 처리해도 안전하다. 단, transform이 identity가 아닐 때 `frame` 값은 Apple 문서상 \"정의되지 않음\"이므로 위치 계산은 center/bounds 기반으로 해야 한다.",
+    relatedTopicSlugs: ["04-uikit/auto-layout"],
+  },
+  {
+    id: "objective-c04-intermediate-calayer-autolayout-001",
+    type: "objective",
+    level: "intermediate",
+    category: "UIKit",
+    prompt: "직접 추가한 `CAGradientLayer`가 부모 뷰 크기 변경 시 따라가지 않는다. 가장 정석적인 해결책은?",
+    choices: [
+      { id: "a", text: "CAGradientLayer에 NSLayoutConstraint를 추가한다" },
+      { id: "b", text: "부모 UIView의 `layoutSubviews()`에서 `gradientLayer.frame = bounds`로 동기화한다" },
+      { id: "c", text: "CAGradientLayer를 UIView로 감싸면 자동으로 Auto Layout이 적용된다" },
+      { id: "d", text: "CATransaction에 등록하면 시스템이 자동으로 frame을 맞춰준다" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "직접 추가한 CALayer(서브레이어)는 NSLayoutConstraint의 대상이 아니다. 제약은 UIView에만 걸리고, 그 안의 sublayer는 수동 frame 갱신이 필요하다. 부모 뷰의 `layoutSubviews()`(또는 VC의 `viewDidLayoutSubviews()`)에서 `layer.frame = bounds`로 매 레이아웃 패스마다 동기화해야 한다. 이 함정 때문에 `viewDidLoad`에서 frame을 잡으면 그 시점의 bounds가 최종값이 아니라 어긋난다.",
+    relatedTopicSlugs: ["04-uikit/auto-layout", "04-uikit/core-animation"],
+  },
+  {
+    id: "objective-c04-intermediate-didmovetowindow-001",
+    type: "objective",
+    level: "intermediate",
+    category: "UIKit",
+    prompt: "반복 펄스 애니메이션을 시작/정지하기에 가장 적절한 콜백은?",
+    choices: [
+      { id: "a", text: "`init` — 객체가 만들어지는 시점이라 가장 안전하다" },
+      { id: "b", text: "`viewDidLoad` — 뷰가 로드되었으므로 곧바로 시작한다" },
+      { id: "c", text: "`didMoveToWindow()` — `window != nil`이면 시작, `nil`이면 정지" },
+      { id: "d", text: "`layoutSubviews()` — 매 레이아웃마다 시작·정지를 반복한다" },
+    ],
+    correctChoiceId: "c",
+    explanation:
+      "뷰가 superview에 추가됐다고 해서 화면에 보이는 건 아니다. 윈도우에 붙어야 진짜 화면에 등장한다. `didMoveToWindow()`에서 `window != nil`로 가드해 시작하고, `window == nil`이면 정지하면 화면에서 내려갔을 때 자동으로 리소스(애니메이션·타이머·DisplayLink)를 회수할 수 있다. `viewDidLoad`/`init`은 아직 윈도우에 없는 시점이라 부적절하고, `layoutSubviews`는 자주 호출되므로 부적절하다.",
+    relatedTopicSlugs: ["04-uikit/viewcontroller-lifecycle"],
+  },
 ];

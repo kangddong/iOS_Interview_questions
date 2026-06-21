@@ -545,4 +545,57 @@ export const questions: RawExamQuestion[] = [
       "TCA TestStore는 Reducer에서 반환된 모든 Effect를 추적합니다. 테스트가 끝날 때 처리되지 않은 Effect가 남아 있으면 '이 부수효과를 테스트에서 검증하지 않았다'는 의미로 실패합니다. 이를 통해 개발자가 부수효과를 못 본 척 넘기지 못하게 강제합니다.",
     relatedTopicSlugs: ["06-architecture/tca"],
   },
+
+  // ─── viper (add: 3) ──────────────────────────────────────────────────────
+  {
+    id: "objective-c06-intermediate-viper-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Architecture",
+    prompt: "VIPER에서 비즈니스 로직(API 호출, 데이터 변환)을 담당하는 컴포넌트는?",
+    choices: [
+      { id: "a", text: "View — 사용자 입력을 받아 직접 네트워크 호출" },
+      { id: "b", text: "Interactor — Presenter의 요청을 받아 use case 단위 비즈니스 로직 수행" },
+      { id: "c", text: "Presenter — View와 Router 사이의 모든 데이터 변환" },
+      { id: "d", text: "Router — 화면 전환 외에 도메인 규칙 검증도 담당" },
+    ],
+    correctChoiceId: "b",
+    explanation:
+      "VIPER의 다섯 역할 중 **Interactor**가 비즈니스 로직(API 호출, repository 접근, 도메인 규칙)을 담당한다. Presenter는 View와 Interactor를 잇는 표현 로직과 포매팅, Router는 화면 전환과 모듈 조립, Entity는 순수 데이터 모델이다. View는 가능한 한 dumb하게 유지하고 Presenter가 전달한 ViewModel만 표시한다.",
+    relatedTopicSlugs: ["06-architecture/viper"],
+  },
+  {
+    id: "objective-c06-intermediate-viper-002",
+    type: "objective",
+    level: "intermediate",
+    category: "Architecture",
+    prompt: "VIPER가 MVVM 대비 갖는 핵심 장단점으로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "장점: 모듈 경계가 명확해 단위 테스트가 쉽다 / 단점: 작은 화면에도 5개 클래스가 필요해 보일러플레이트가 많다" },
+      { id: "b", text: "장점: View ↔ ViewModel 양방향 바인딩이 자동화된다 / 단점: 컴파일 시간이 항상 더 길다" },
+      { id: "c", text: "장점: SwiftUI와 자연스럽게 결합된다 / 단점: UIKit에서는 사용 불가" },
+      { id: "d", text: "장점: 의존성 주입이 불필요하다 / 단점: 비동기 코드 작성이 어렵다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "VIPER는 각 역할의 경계가 프로토콜로 분리되어 mock 주입과 단위 테스트가 용이하지만, 작은 화면에도 5개 클래스(+ Builder/Configurator)가 필요해 보일러플레이트 부담이 크다. MVVM과 SwiftUI 결합이 더 자연스러우므로 신규 SwiftUI 프로젝트에선 MVVM/TCA 쪽이 일반적이고, 큰 UIKit 화면 단위 모듈을 명확히 분리해야 할 때 VIPER가 선택된다.",
+    relatedTopicSlugs: ["06-architecture/viper"],
+  },
+  {
+    id: "objective-c06-advanced-viper-003",
+    type: "objective",
+    level: "advanced",
+    category: "Architecture",
+    prompt: "VIPER 모듈에서 Router(또는 Wireframe)가 갖는 책임 경계로 옳은 것은?",
+    choices: [
+      { id: "a", text: "Router는 다른 모듈로의 화면 전환 트리거와 의존성 조립을 담당하고, 비즈니스 로직 자체는 갖지 않는다" },
+      { id: "b", text: "Router는 모든 화면 전환을 직접 결정하므로 Presenter는 navigation에 관여하지 않는다" },
+      { id: "c", text: "Router는 Interactor와 동일한 책임을 가지며 보통 같은 클래스로 합쳐 구현한다" },
+      { id: "d", text: "Router는 항상 UINavigationController의 서브클래스여야 한다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "Router(Wireframe)는 화면 전환의 *어디로*를 알고 트리거를 받아 실행하며, 새로운 모듈을 조립(View/Interactor/Presenter/Router 인스턴스 생성 + 와이어링)하는 역할을 한다. *언제* 전환할지는 Presenter가 사용자/도메인 이벤트를 보고 결정해 Router에 위임한다. Interactor의 비즈니스 로직과는 분리되어야 하며, UIKit 컨테이너 종류에 묶이지 않는다.",
+    relatedTopicSlugs: ["06-architecture/viper"],
+  },
 ];

@@ -402,4 +402,23 @@ export const questions: RawExamQuestion[] = [
       "measure { } 블록은 내부적으로 여러 번 실행해 평균과 표준편차를 측정합니다. CI 서버는 동시에 다른 빌드가 실행되거나 하드웨어 부하가 일정하지 않아 노이즈가 크므로, 베이스라인(기준값)이 환경마다 달라 거짓 실패가 자주 발생합니다. 성능 테스트는 전용 환경(맥 미니, 일정 사양 머신)에서 별도 스킴으로 관리하는 것이 권장됩니다.",
     relatedTopicSlugs: ["09-testing/xctest"],
   },
+
+  // ─── xctunwrap (add: 1) ──────────────────────────────────────────────────
+  {
+    id: "objective-c09-intermediate-xctunwrap-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Testing",
+    prompt: "XCTest에서 `XCTUnwrap(_:)`를 `XCTAssertNotNil` + `!` 강제 언래핑 대신 권장하는 이유는?",
+    choices: [
+      { id: "a", text: "nil이면 `XCTUnwrap`은 *현재 테스트만 실패*시키고 다음 테스트로 넘어가는 반면, 강제 언래핑은 테스트 러너 전체를 trap·중단시켜 후속 테스트가 실행되지 않는다" },
+      { id: "b", text: "XCTUnwrap이 강제 언래핑보다 항상 빠르다" },
+      { id: "c", text: "강제 언래핑은 Swift Testing에서만 사용 가능하다" },
+      { id: "d", text: "XCTUnwrap은 nil이어도 항상 통과시킨다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "강제 언래핑(`!`)이 nil에 부딪히면 Swift 런타임이 trap하여 프로세스가 죽고 *그 시점 이후의 모든 테스트*가 실행되지 않는다. `XCTUnwrap`은 nil일 때 `XCTestError`를 throw해 현재 테스트만 실패 처리하고 러너는 계속 다음 테스트로 넘어가므로 CI에서 한 번에 더 많은 정보를 얻을 수 있다. Swift Testing에서는 `#require`가 같은 역할을 한다.",
+    relatedTopicSlugs: ["09-testing/xctest"],
+  },
 ];

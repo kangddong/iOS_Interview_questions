@@ -220,4 +220,40 @@ export const questions: RawExamQuestion[] = [
       "LSP는 서브타입이 슈퍼타입의 *계약*을 완전히 따라야 한다는 원칙입니다. Rectangle에서 너비와 높이는 독립적으로 설정 가능하다는 계약이 있을 때, Square 서브클래스가 `setWidth`에서 height도 바꾸면 이 계약을 위반합니다. 결과적으로 `Rectangle` 타입 변수에 `Square`를 대입했을 때 예상치 못한 동작이 발생합니다. 이 경우 Square는 상속 대신 별개 타입으로 모델링해야 합니다. b는 SRP, c는 ISP, d는 DIP 위반입니다.",
     relatedTopicSlugs: ["15-paradigms/oop"],
   },
+
+  // ─── pop (add: 2) ────────────────────────────────────────────────────────
+  {
+    id: "objective-c15-intermediate-pop-fundamentals-001",
+    type: "objective",
+    level: "intermediate",
+    category: "Paradigms",
+    prompt: "Swift 프로토콜 *extension의 default implementation*과 *프로토콜 요구 사항(requirement)*의 디스패치 차이로 옳은 것은?",
+    choices: [
+      { id: "a", text: "프로토콜 requirement는 witness table을 통한 동적 디스패치, extension에만 정의된 메서드(요구사항 아님)는 컴파일 시 정적 디스패치된다" },
+      { id: "b", text: "둘 다 항상 동적 디스패치되므로 차이가 없다" },
+      { id: "c", text: "둘 다 항상 정적 디스패치되므로 채택 타입에서 override가 불가능하다" },
+      { id: "d", text: "extension의 default impl은 ObjC 런타임을 통해 동적 디스패치된다" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "프로토콜 본문에 선언된 *요구사항*은 채택 타입이 반드시 제공해야 하며 witness table을 거쳐 동적 디스패치된다. 반면 extension에만 정의되고 본문에 요구사항이 없는 메서드는 채택 타입이 같은 시그니처의 메서드를 정의해도 *컴파일 시 변수의 정적 타입*으로 디스패치되므로, `let p: P = S()`에서 `p.foo()`를 부르면 S가 override해도 P의 default impl이 호출된다. 이 차이가 POP의 흔한 함정.",
+    relatedTopicSlugs: ["15-paradigms/fp", "01-swift-language/protocol-oriented-programming"],
+  },
+  {
+    id: "objective-c15-basic-higher-order-functions-001",
+    type: "objective",
+    level: "basic",
+    category: "Paradigms",
+    prompt: "*순수 함수(pure function)* 의 정의로 가장 정확한 것은?",
+    choices: [
+      { id: "a", text: "같은 입력에 대해 항상 같은 출력을 반환하고, 외부 상태를 읽거나 변경하지 않는 함수" },
+      { id: "b", text: "throws를 사용하지 않는 함수" },
+      { id: "c", text: "@inlinable이 붙은 함수" },
+      { id: "d", text: "Swift Concurrency의 async 함수" },
+    ],
+    correctChoiceId: "a",
+    explanation:
+      "순수 함수는 *referential transparency*를 만족한다 — 동일 인자에 대해 항상 같은 결과를 반환하고, 외부 상태(전역 변수, I/O, 시계 등)에 의존하거나 변경하지 않는다. 이 성질 덕분에 테스트·캐시·병렬화·합성이 쉬워진다. `map`/`filter`/`reduce` 같은 고차함수는 인자로 받은 함수가 pure할 때 안전하게 합성된다.",
+    relatedTopicSlugs: ["15-paradigms/fp"],
+  },
 ];
