@@ -69,7 +69,7 @@ export default function HomePage() {
             <p className="eyebrow">Roadmap</p>
             <h2 id="roadmap-title">학습 로드맵</h2>
           </div>
-          <Link href="/topics/00-overview" className="text-link">
+          <Link href="/roadmap" className="text-link">
             전체 로드맵
             <ArrowRight size={16} aria-hidden="true" />
           </Link>
