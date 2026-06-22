@@ -115,6 +115,12 @@ class NotificationService: UNNotificationServiceExtension {
 - **Q. Live Activity 푸시 업데이트는 일반 푸시와 뭐가 다른가?**
   - A. `apns-push-type: liveactivity`, ActivityKit이 발급한 push token (deviceToken 아님), payload는 `content-state` 등 ActivityKit 스키마.
 
+## 관련
+
+- 서버 측 발송 추상화 / Topic·Multicast / Android 동시 지원 → [fcm.md](fcm.md)
+- 보안 토큰 저장 정책 → [../08-persistence/keychain.md](../08-persistence/keychain.md)
+- HTTP/2 spec → [../14-network/http2-http3.md](../14-network/http2-http3.md)
+
 ## 참고
 
 - WWDC 2020 — *Push Notifications: a primer to deep integration*
