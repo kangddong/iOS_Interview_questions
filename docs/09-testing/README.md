@@ -80,3 +80,4 @@
 - Singleton 코드를 어떻게 테스트하나 → [mocking.md](mocking.md)
 - flaky 테스트 원인 → [xctest.md](xctest.md)
 - 시간 의존 코드 테스트 → [mocking.md](mocking.md)
+- Combine / RxSwift 스트림 테스트 → [xctest.md](xctest.md)
