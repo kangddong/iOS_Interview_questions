@@ -126,6 +126,7 @@ init(auth: AuthAPIType = AuthAPI.shared) { self.auth = auth }
 
 ## 참고
 
+- [테스트 가능한 코드 설계](../09-testing/testable-code-design.md) — DI는 testability 설계의 한 도구. 부수효과 분리·Humble Object·seam과 함께 본다.
 - objc.io: Dependency Injection
 - Point-Free: swift-dependencies
 - Martin Fowler: Inversion of Control Containers and the Dependency Injection pattern
