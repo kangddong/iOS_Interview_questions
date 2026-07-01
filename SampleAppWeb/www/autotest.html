@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><title>autotest</title>
+<link rel="stylesheet" href="data:text/css,">
+</head><body>
+<div id="app"></div>
+<script type="module">
+  import { init } from "./index.js";
+  await init();
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  await sleep(50);
+  // 1) 메모리 관리 카테고리 진입
+  [...document.querySelectorAll('.row')].find(b => b.textContent.includes('메모리 관리')).click();
+  await sleep(50);
+  // 2) Retain Cycle 데모 진입 (deinit 순서 출력 확인용)
+  [...document.querySelectorAll('.row-demo')].find(b => b.textContent.includes('Retain Cycle')).click();
+  await sleep(50);
+  // 3) 실행 버튼 클릭
+  document.querySelector('.btn-primary').click();
+  await sleep(50);
+</script>
+</body></html>

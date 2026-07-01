@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SampleApp — iOS Simulator (Wasm)</title>
+  <style>
+    :root {
+      --bg:#f2f2f7; --card:#fff; --line:#e5e5ea; --tint:#007aff;
+      --muted:#8e8e93; --text:#1c1c1e;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+      /* 시뮬레이터가 놓인 '책상' 배경 */
+      background: radial-gradient(circle at 50% 30%, #3a3a3c 0%, #1c1c1e 70%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px; gap: 14px;
+    }
+    .caption { color: #98989d; font-size: 12px; letter-spacing: .02em; text-align: center; line-height: 1.5; }
+    .caption b { color: #f2f2f7; }
+
+    /* ===== 아이폰 기기 프레임 ===== */
+    .device {
+      position: relative;
+      width: 390px; height: 844px;         /* iPhone 14/15 논리 해상도 */
+      background: #000; border-radius: 55px;
+      padding: 12px;
+      box-shadow: 0 0 0 12px #1a1a1c, 0 0 0 14px #2c2c2e, 0 30px 70px rgba(0,0,0,.6);
+    }
+    .screen {
+      position: relative; width: 100%; height: 100%;
+      background: var(--bg); border-radius: 44px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    /* 다이나믹 아일랜드 */
+    .island {
+      position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+      width: 125px; height: 36px; background: #000; border-radius: 20px; z-index: 20;
+    }
+    /* 상태바 */
+    .statusbar {
+      height: 54px; flex: 0 0 auto; z-index: 10;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 30px 6px; font-size: 15px; font-weight: 600; color: var(--text);
+    }
+    .statusbar .icons { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+    /* CSS로 그린 신호/배터리 아이콘 (폰트 의존 X) */
+    .signal { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+    .signal i { width: 3px; background: var(--text); border-radius: 1px; }
+    .signal i:nth-child(1) { height: 5px; }
+    .signal i:nth-child(2) { height: 7px; }
+    .signal i:nth-child(3) { height: 9px; }
+    .signal i:nth-child(4) { height: 12px; }
+    .battery { display: inline-block; position: relative; width: 24px; height: 12px;
+               border: 1.5px solid var(--text); border-radius: 3px; opacity: .9; }
+    .battery::after { content: ""; position: absolute; right: -3px; top: 3px; width: 2px; height: 5px;
+                      background: var(--text); border-radius: 0 1px 1px 0; }
+    .battery b { position: absolute; inset: 1.5px; width: calc(100% - 3px); background: var(--text); border-radius: 1px; display: block; }
+    /* 앱 화면 스크롤 영역 */
+    #app {
+      flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 4px 16px 40px;
+    }
+    #app::-webkit-scrollbar { width: 0; }
+    /* 홈 인디케이터 */
+    .home-indicator {
+      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      width: 140px; height: 5px; border-radius: 3px; background: #000; opacity: .85; z-index: 20;
+    }
+
+    /* ===== 앱 내부 UI (SwiftUI 룩) ===== */
+    .nav { display: flex; align-items: center; gap: 10px; margin: 6px 0 10px; min-height: 30px; }
+    .nav-title { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+    .subtitle { color: var(--muted); font-size: 13px; margin: -2px 0 14px; line-height: 1.5; }
+    .back {
+      border: none; background: none; color: var(--tint); font-size: 16px;
+      cursor: pointer; padding: 4px 0; font-weight: 500;
+    }
+    .list { display: flex; flex-direction: column; gap: 1px; background: var(--line);
+            border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+    .row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--card); border: none; padding: 13px 15px; cursor: pointer;
+      font-size: 16px; text-align: left; width: 100%; color: var(--text);
+      transition: background .12s;
+    }
+    .row:active:not([disabled]) { background: #eaeaef; }
+    .row[disabled] { cursor: default; opacity: 0.5; }
+    .row-demo { align-items: flex-start; }
+    .col { display: flex; flex-direction: column; gap: 3px; }
+    .row-title { font-weight: 600; }
+    .row-summary { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+    .chevron { color: #c7c7cc; font-size: 20px; font-weight: 600; }
+    .badge { background: var(--tint); color: #fff; font-size: 11px; font-weight: 700;
+             padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+    .badge-muted { background: #c7c7cc; }
+    .demo-title { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 4px; }
+    .demo-summary { color: #3a3a3c; font-size: 14.5px; line-height: 1.5; margin: 0 0 8px; }
+    .docpath { display: inline-block; font-size: 11px; color: var(--muted);
+               background: #e9e9ee; padding: 3px 8px; border-radius: 6px; margin-bottom: 16px; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .btn { border: 1px solid var(--line); background: var(--card); border-radius: 9px;
+           padding: 9px 16px; font-size: 15px; cursor: pointer; font-weight: 600; }
+    .btn:active { opacity: .7; }
+    .btn-primary { background: var(--tint); color: #fff; border-color: var(--tint); }
+    .console {
+      background: #1c1c1e; color: #e5e5ea; border-radius: 12px; padding: 14px 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+      line-height: 1.6; white-space: pre-wrap; word-break: break-word; margin: 0; min-height: 60px;
+    }
+    .theory { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 6px 15px; }
+    .bullet { display: flex; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); line-height: 1.5; font-size: 14.5px; }
+    .bullet:last-child { border-bottom: none; }
+    .dot { color: var(--tint); font-weight: 700; }
+    .ios-only { background: #fff7e6; border: 1px solid #ffe0a3; border-radius: 12px; padding: 15px; line-height: 1.5; font-size: 14px; }
+    .ios-only-tag { color: #b26a00; font-weight: 700; font-size: 12px; margin-bottom: 8px; }
+    .footer { color: var(--muted); font-size: 11px; text-align: center; margin-top: 22px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="device">
+    <div class="island"></div>
+    <div class="screen">
+      <div class="statusbar">
+        <span id="clock">9:41</span>
+        <span class="icons">
+          <span class="signal"><i></i><i></i><i></i><i></i></span>
+          <span style="font-size:13px;font-weight:700">5G</span>
+          <span class="battery"><b></b></span>
+        </span>
+      </div>
+      <div id="app"></div>
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+  <div class="caption">
+    <b>SampleApp</b> · Swift → WebAssembly · JavaScriptKit<br>
+    iOS 시뮬레이터 룩 · 앱 로직은 wasm에서 실행됩니다
+  </div>
+
+  <script>
+    // 상태바 실시간 시계
+    function tick() {
+      const d = new Date();
+      const h = d.getHours(), m = String(d.getMinutes()).padStart(2, "0");
+      document.getElementById("clock").textContent = `${h}:${m}`;
+    }
+    tick(); setInterval(tick, 10000);
+  </script>
+  <script type="module">
+    import { init } from "./index.js";
+    await init();
+  </script>
+</body>
+</html>
