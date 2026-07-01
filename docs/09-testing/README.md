@@ -59,7 +59,7 @@
 복잡한 layout / 디자인 시스템                  → 스냅샷
 ```
 
-→ "Singleton을 어떻게 테스트하나?" → 추상화 + 주입으로 변환. 즉, 테스트 가능한 코드를 *설계* 단계에서 만들어야 한다.
+→ "Singleton을 어떻게 테스트하나?" → 추상화 + 주입으로 변환. 즉, 테스트 가능한 코드를 *설계* 단계에서 만들어야 한다. (→ [테스트 가능한 코드 설계](testable-code-design.md))
 
 ## 항목
 
@@ -67,6 +67,7 @@
 - [Swift Testing](swift-testing.md) — Xcode 16+, `@Test`, `#expect`, parameterized
 - [Mocking 전략](mocking.md) — Stub/Mock/Spy/Fake, protocol 추상화, URLProtocol 가짜 응답
 - [Snapshot / UI Testing](snapshot-and-ui-testing.md) — *3년차+*. 시각 회귀, XCUITest, page object, launchArguments
+- [테스트 가능한 코드 설계](testable-code-design.md) — Functional Core/Imperative Shell, Humble Object, 비결정성 주입, seam. *"테스트하기 어렵다 = 설계 신호"*
 
 ## 시니어
 
@@ -78,6 +79,7 @@
 - 비동기 코드 테스트 → [xctest.md](xctest.md)
 - Mock과 Stub 차이 → [mocking.md](mocking.md)
 - Singleton 코드를 어떻게 테스트하나 → [mocking.md](mocking.md)
+- 테스트하기 쉬운 코드를 어떻게 설계하나 → [testable-code-design.md](testable-code-design.md)
 - flaky 테스트 원인 → [xctest.md](xctest.md)
 - 시간 의존 코드 테스트 → [mocking.md](mocking.md)
 - Combine / RxSwift 스트림 테스트 → [xctest.md](xctest.md)

@@ -100,6 +100,10 @@
 
 ## Testing 심화
 
+- **"이 코드 테스트하기 어렵다"는 어떤 설계 신호인가 (결합·은닉·비결정성)** → [testable-code-design](../09-testing/testable-code-design.md)
+- **Functional Core / Imperative Shell로 부수효과와 로직 분리하기** → [testable-code-design](../09-testing/testable-code-design.md)
+- **`Date()`/`UUID()`/`random`을 의존성으로 끌어내는 이유** → [testable-code-design](../09-testing/testable-code-design.md)
+- **Humble Object — ViewController/View를 얇게 두고 로직을 VM으로** → [testable-code-design](../09-testing/testable-code-design.md)
 - **Singleton 코드를 테스트 가능하게 만드는 protocol + 기본값 패턴** → [mocking](../09-testing/mocking.md)
 - **`URLSession`을 mock하는 두 방법 (protocol 추상화 / `URLProtocol`)** → [mocking](../09-testing/mocking.md)
 - **시간 의존 코드 테스트 (Date provider, swift-dependencies)** → [mocking](../09-testing/mocking.md)
